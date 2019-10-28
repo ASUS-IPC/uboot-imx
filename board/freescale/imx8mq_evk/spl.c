@@ -14,8 +14,7 @@
 #include <asm/arch/imx8mq_pins.h>
 #include <asm/arch/sys_proto.h>
 #include <power/pmic.h>
-#include <power/pfuze100_pmic.h>
-#include "../common/pfuze.h"
+#include <power/bd71837.h>
 #include <asm/arch/clock.h>
 #include <asm/mach-imx/gpio.h>
 #include <asm/mach-imx/mxc_i2c.h>
@@ -155,37 +154,50 @@ int power_init_board(void)
 {
 	struct pmic *p;
 	int ret;
-	unsigned int reg;
 
-	ret = power_pfuze100_init(I2C_PMIC);
-	if (ret)
-		return -ENODEV;
-
-	p = pmic_get("PFUZE100");
+        printf("start BD71837 power init +++++++++\n");
+	ret = power_bd71837_init(I2C_PMIC);
+	if (ret) {
+		printf("PMIC BD71837 power init failed\n");
+		return ret;
+	}
+	p = pmic_get("BD71837");
 	ret = pmic_probe(p);
-	if (ret)
-		return -ENODEV;
-
-	pmic_reg_read(p, PFUZE100_DEVICEID, &reg);
-	printf("PMIC:  PFUZE100 ID=0x%02x\n", reg);
-
-	pmic_reg_read(p, PFUZE100_SW3AVOL, &reg);
-	if ((reg & 0x3f) != 0x18) {
-		reg &= ~0x3f;
-		reg |= 0x18;
-		pmic_reg_write(p, PFUZE100_SW3AVOL, reg);
+	if (ret) {
+		printf("PMIC BD71837 power probed failed\n");
+		return ret;
 	}
 
-	ret = pfuze_mode_init(p, APS_PFM);
-	if (ret < 0)
-		return ret;
 
-	/* set SW3A standby mode to off */
-	pmic_reg_read(p, PFUZE100_SW3AMODE, &reg);
-	reg &= ~0xf;
-	reg |= APS_OFF;
-	pmic_reg_write(p, PFUZE100_SW3AMODE, reg);
+	/* decrease RESET key long push time from the default 10s to 10ms */
+	pmic_reg_write(p, BD71837_PWRONCONFIG1, 0x0);
 
+	/* unlock the PMIC regs */
+	pmic_reg_write(p, BD71837_REGLOCK, 0x1);
+
+	/* Set BUCK5 output for DRAM to 1.0V */
+	/* 0.70,0.80,0.90,1.00, 1.05,1.10,1.20,1.35 */
+	pmic_reg_write(p, BD71837_BUCK5_VOLT, 0x3);
+
+	/* Set BUCK3 output for VDD_GPU_0V9 to 1.0V */
+	/* 0.7-1.3 (10mVstep) */
+	pmic_reg_write(p, BD71837_BUCK3_VOLT_RUN, 0x1E);
+
+	/* Set BUCK4 output for VDD_VPU_0V9 to 1.0V */
+	/* 0.7-1.3 (10mVstep) */
+	pmic_reg_write(p, BD71837_BUCK4_VOLT_RUN, 0x1E);
+
+	/* Set BUCK2 output for VDD_ARM_0V9 to 1.0V */
+	/* 0.7-1.3 (10mVstep) */
+	pmic_reg_write(p, BD71837_BUCK2_VOLT_RUN, 0x1E);
+
+	/* Set BUCK1 output for VDD_SOC_0V9 to 0.95V */
+	/* 0.7-1.3 (10mVstep) */
+	pmic_reg_write(p, BD71837_BUCK1_VOLT_RUN, 0x19);
+
+	/* lock the PMIC regs */
+	pmic_reg_write(p, BD71837_REGLOCK, 0x11);
+	printf("end BD71837 power init ---------\n");
 	return 0;
 }
 #endif

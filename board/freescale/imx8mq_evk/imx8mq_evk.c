@@ -24,7 +24,7 @@
 #include <asm/arch/video_common.h>
 #include <spl.h>
 #include <power/pmic.h>
-#include <power/pfuze100_pmic.h>
+#include <power/bd71837.h>
 #include <dm.h>
 #include "../common/tcpc.h"
 #include "../common/pfuze.h"
