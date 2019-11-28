@@ -313,7 +313,12 @@ int board_init(void)
 
 int board_mmc_get_env_dev(int devno)
 {
-	return devno;
+	/*
+	 * This is used for determining which MMC fastboot will flash.
+	 * For Phanbell, we should always flash the eMMC even if booting
+	 * SD. This way SD can be used for recovery.
+	 */
+	return CONFIG_SYS_MMC_ENV_DEV;
 }
 
 int board_late_init(void)
