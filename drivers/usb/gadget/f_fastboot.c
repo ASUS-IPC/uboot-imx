@@ -1313,7 +1313,7 @@ static int _fastboot_setup_dev(int *switched)
 	}
 
 	fastboot_devinfo.type	 = devinfo.type;
-	fastboot_devinfo.dev_id = devinfo.dev_id;
+	fastboot_devinfo.dev_id = MEK_8QM_EMMC;
 
 	return 0;
 }
