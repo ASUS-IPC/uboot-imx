@@ -171,6 +171,8 @@
 				"booti ${loadaddr} - ${fdt_addr}; " \
 			"else " \
 				"echo WARN: Cannot load the DT; " \
+				"echo Enter Fastboot Mode; " \
+				"fastboot 0; " \
 			"fi; " \
 		"else " \
 			"booti; " \
