@@ -70,6 +70,8 @@
 #define CONFIG_BOARD_POSTCLK_INIT
 #define CONFIG_BOARD_LATE_INIT
 
+#define CONFIG_BCB_SUPPORT
+
 /* Flat Device Tree Definitions */
 #define CONFIG_OF_BOARD_SETUP
 
