@@ -90,9 +90,9 @@ extern void trusty_os_init(void);
 #define FASTBOOT_VERSION		"0.4"
 
 #if defined(CONFIG_ANDROID_THINGS_SUPPORT) && defined(CONFIG_ARCH_IMX8M)
-#define FASTBOOT_COMMON_VAR_NUM 15
+#define FASTBOOT_COMMON_VAR_NUM 16
 #else
-#define FASTBOOT_COMMON_VAR_NUM 14
+#define FASTBOOT_COMMON_VAR_NUM 15
 #endif
 
 #define FASTBOOT_VAR_YES    "yes"
@@ -157,6 +157,7 @@ char *fastboot_common_var[FASTBOOT_COMMON_VAR_NUM] = {
 	"variant",
 	"battery-soc-ok",
 	"bootdev",
+	"LAN1",
 #if defined(CONFIG_ANDROID_THINGS_SUPPORT) && defined(CONFIG_ARCH_IMX8M)
 	"baseboard_id"
 #endif
@@ -3229,6 +3230,10 @@ static int get_single_var(char *cmd, char *response)
 		char *boot_dev;
 		boot_dev = env_get("mmcdev");
 		strncat(response, boot_dev, chars_left);
+	} else if (!strcmp_l1("LAN1", cmd)) {
+		char *eth_addr;
+		eth_addr = env_get("ethaddr");
+		strncat(response, eth_addr, chars_left);
 	} else if (!strcmp_l1("version-baseband", cmd)) {
 		strncat(response, "N/A", chars_left);
 	} else if (!strcmp_l1("version-bootloader", cmd) ||
