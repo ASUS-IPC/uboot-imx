@@ -59,7 +59,7 @@ void imx_get_mac_from_fuse(int dev_id, unsigned char *mac)
 		mac[5] = value;
 	}
 
-	if (mac[0] == mac[1] == mac[2] == mac[3] == mac[4] == mac[5] == 0xff) {
+	if (mac[0] == 0xff && mac[1] == 0xff && mac[2] == 0xff && mac[3] == 0xff && mac[4] == 0xff && mac[5] == 0xff) {
 		u32 value = readl(&fuse->mac_addr1);
 
 		mac[0] = value >> 24;
