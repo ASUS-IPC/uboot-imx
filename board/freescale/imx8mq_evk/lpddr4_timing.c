@@ -1,199 +1,124 @@
 /*
- * Copyright 2018 NXP
+ * Copyright 2019 NXP
  *
  * SPDX-License-Identifier: GPL-2.0+
  */
 #include <linux/kernel.h>
-#include <common.h>
-#include <asm/arch/ddr.h>
 #include <asm/arch/imx8m_ddr.h>
 
-#define LPDDR4_HDT_CTL_2D 	0xC8  /* stage completion */
-#define LPDDR4_HDT_CTL_3200_1D	0xC8  /* stage completion */
-#define LPDDR4_HDT_CTL_400_1D 	0xC8  /* stage completion */
-#define LPDDR4_HDT_CTL_100_1D 	0xC8  /* stage completion */
+struct dram_cfg_param ddr_ddrc_cfg[] = {
+	{ 0x3d400304, 0x1 },
+	{ 0x3d400030, 0x1 },
+	{ 0x3d400000, 0xa3080020 },
+	{ 0x3d400028, 0x0 },
 
-// 400/100 training seq
-#define LPDDR4_TRAIN_SEQ_100 	0x121f
-#define LPDDR4_TRAIN_SEQ_400 	0x121f
+	{ 0x3d400064, 0x6100e0 },
+	{ 0x3d4000d0, 0xc003061b },
+	{ 0x3d4000d4, 0x9d0000 },
+	{ 0x3d4000dc, 0xd4002d },
+	{ 0x3d4000e0, 0x330008 },
+	{ 0x3d4000e8, 0x66004a },
+	{ 0x3d4000ec, 0x06004a },
 
-//2D share & weight
-#define LPDDR4_2D_WEIGHT 	0x1f7f
-#define LPDDR4_2D_SHARE		1
-#define LPDDR4_CATRAIN_3200_1d	0
-#define LPDDR4_CATRAIN_400	0
-#define LPDDR4_CATRAIN_100	0
-#define LPDDR4_CATRAIN_3200_2d	0
+	{ 0x3d400100, 0x1a201b22 },
+	{ 0x3d400104, 0x60633 },
+	{ 0x3d40010c, 0xc0c000 },
+	{ 0x3d400110, 0xf04080f },
+	{ 0x3d400114, 0x2040c0c },
+	{ 0x3d400118, 0x1010007 },
+	{ 0x3d40011c, 0x401 },
+	{ 0x3d400130, 0x20600 },
+	{ 0x3d400134, 0xc100002 },
+	{ 0x3d400138, 0xe6 },
+	{ 0x3d400144, 0xa00050 },
+	{ 0x3d400180, 0x03200018 },
+	{ 0x3d400184, 0x28061a8 },
+	{ 0x3d400188, 0x0 },
 
-#define WR_POST_EXT_3200  /* recommened to define */
+	{ 0x3d400190, 0x497820a },
+	{ 0x3d400194, 0x80303 },
+	{ 0x3d4001a0, 0xe0400018 },
+	{ 0x3d4001a4, 0xdf00e4 },
+	{ 0x3d4001a8, 0x80000000 },
+	{ 0x3d4001b0, 0x11 },
+	{ 0x3d4001b4, 0x170a },
 
-/* for LPDDR4 Rtt */
-#define LPDDR4_RTT40	6
-#define LPDDR4_RTT48	5
-#define LPDDR4_RTT60	4
-#define LPDDR4_RTT80	3
-#define LPDDR4_RTT120	2
-#define LPDDR4_RTT240	1
-#define LPDDR4_RTT_DIS	0
+	{ 0x3d4001c0, 0x1 },
+	{ 0x3d4001c4, 0x1 },
+	{ 0x3d4000f4, 0xc99 },
+	{ 0x3d400108, 0x70e171a },
 
-/* for LPDDR4 Ron */
-#define LPDDR4_RON34	7
-#define LPDDR4_RON40	6
-#define LPDDR4_RON48	5
-#define LPDDR4_RON60	4
-#define LPDDR4_RON80	3
+	{ 0x3d400200, 0x17 },
+	{ 0x3d40020c, 0x0 },
+	{ 0x3d400210, 0x1f1f },
+	{ 0x3d400204, 0x80808 },
+	{ 0x3d400214, 0x7070707 },
+	{ 0x3d400218, 0x7070707 },
 
-#define LPDDR4_PHY_ADDR_RON60	0x1
-#define LPDDR4_PHY_ADDR_RON40   0x3
-#define LPDDR4_PHY_ADDR_RON30   0x7
-#define LPDDR4_PHY_ADDR_RON24   0xf
-#define LPDDR4_PHY_ADDR_RON20   0x1f
+        { 0x3d403024, 0x7e9fbeb1 },
+	{ 0x3d402064, 0xc001c },
+	{ 0x3d4020dc, 0x840000 },
+	{ 0x3d4020e0, 0x310008 },
+	{ 0x3d4020e8, 0x66004a },
+	{ 0x3d4020ec, 0x06004a },
+	{ 0x3d402100, 0xd0b010c },
+	{ 0x3d402104, 0x30410 },
+	{ 0x3d402108, 0x305090c },
+	{ 0x3d40210c, 0x505006 },
+	{ 0x3d402110, 0x5040305 },
+	{ 0x3d402114, 0x0d0e0504 },
+	{ 0x3d402118, 0x0a060004 },
+	{ 0x3d40211c, 0x90e },
+	{ 0x3d402138, 0x32 },
+	{ 0x3d40213c, 0x0 },
+	{ 0x3d403144, 0x36001b },
+	{ 0x3d402190, 0x03818200 },
+	{ 0x3d4021b4, 0x00000000 },
 
-/* for read channel */
-#define LPDDR4_RON			LPDDR4_RON40 /* MR3[5:3] */
-#define LPDDR4_PHY_RTT			30
-#define LPDDR4_PHY_VREF_VALUE 		17
 
-/* for write channel */
-#define LPDDR4_PHY_RON			30
-#define LPDDR4_PHY_ADDR_RON         	LPDDR4_PHY_ADDR_RON40
-#define LPDDR4_RTT_DQ			LPDDR4_RTT40 /* MR11[2:0] */
-#define LPDDR4_RTT_CA			LPDDR4_RTT40 /* MR11[6:4] */
-#define LPDDR4_RTT_CA_BANK0		LPDDR4_RTT40 /* MR11[6:4] */
-#define LPDDR4_RTT_CA_BANK1		LPDDR4_RTT40 /* LPDDR4_RTT_DIS */
-#define LPDDR4_VREF_VALUE_CA		((1 << 6) | (0xd)) /* MR12 */
-#define LPDDR4_VREF_VALUE_DQ_RANK0	((1 << 6) | (0xd)) /* MR14 */
-#define LPDDR4_VREF_VALUE_DQ_RANK1	((1 << 6) | (0xd)) /* MR14 */
-#define LPDDR4_MR22_RANK0           	((0 << 5) | (1 << 4) | (0 << 3) | (LPDDR4_RTT40)) /* MR22: OP[5:3]ODTD-CA,CS,CK */
-#define LPDDR4_MR22_RANK1		((0 << 5) | (1 << 4) | (0 << 3) | (LPDDR4_RTT40)) /* MR22: OP[5:3]ODTD-CA,CS,CK */
-#define LPDDR4_MR3_PU_CAL		1 /* MR3[0] */
-
-struct dram_cfg_param lpddr4_ddrc_cfg[] = {
-	/* Start to config, default 3200mbps */
-	{ DDRC_DBG1(0), 0x00000001 },
-	{ DDRC_PWRCTL(0), 0x00000001 },
-	{ DDRC_MSTR(0), 0xa3080020 },
-	{ DDRC_MSTR2(0), 0x00000000 },
-	{ DDRC_RFSHTMG(0), 0x006100E0 },
-	{ DDRC_INIT0(0), 0xC003061B },
-	{ DDRC_INIT1(0), 0x009D0000 },
-	{ DDRC_INIT3(0), 0x00D4002D },
-#ifdef WR_POST_EXT_3200
-	{ DDRC_INIT4(0), 0x00330008 },
-#else
-	{ DDRC_INIT4(0), 0x00310008 },
-#endif
-	{ DDRC_INIT6(0), 0x0066004a },
-	{ DDRC_INIT7(0), 0x0006004a },
-
-	{ DDRC_DRAMTMG0(0), 0x1A201B22 },
-	{ DDRC_DRAMTMG1(0), 0x00060633 },
-	{ DDRC_DRAMTMG3(0), 0x00C0C000 },
-	{ DDRC_DRAMTMG4(0), 0x0F04080F },
-	{ DDRC_DRAMTMG5(0), 0x02040C0C },
-	{ DDRC_DRAMTMG6(0), 0x01010007 },
-	{ DDRC_DRAMTMG7(0), 0x00000401 },
-	{ DDRC_DRAMTMG12(0), 0x00020600 },
-	{ DDRC_DRAMTMG13(0), 0x0C100002 },
-	{ DDRC_DRAMTMG14(0), 0x000000E6 },
-	{ DDRC_DRAMTMG17(0), 0x00A00050 },
-
-	{ DDRC_ZQCTL0(0), 0x03200018 },
-	{ DDRC_ZQCTL1(0), 0x028061A8 },
-	{ DDRC_ZQCTL2(0), 0x00000000 },
-
-	{ DDRC_DFITMG0(0), 0x0497820A },
-	{ DDRC_DFITMG1(0), 0x00080303 },
-	{ DDRC_DFIUPD0(0), 0xE0400018 },
-	{ DDRC_DFIUPD1(0), 0x00DF00E4 },
-	{ DDRC_DFIUPD2(0), 0x80000000 },
-	{ DDRC_DFIMISC(0), 0x00000011 },
-	{ DDRC_DFITMG2(0), 0x0000170A },
-
-	{ DDRC_DBICTL(0), 0x00000001 },
-	{ DDRC_DFIPHYMSTR(0), 0x00000001 },
-	{ DDRC_RANKCTL(0), 0x00000c99 },
-	{ DDRC_DRAMTMG2(0), 0x070E171a },
-
-	/* address mapping */
-	{ DDRC_ADDRMAP0(0), 0x00000017 },
-	{ DDRC_ADDRMAP3(0), 0x00000000 },
-	{ DDRC_ADDRMAP4(0), 0x00001F1F },
-	/* bank interleave */
-	{ DDRC_ADDRMAP1(0), 0x00080808 },
-	{ DDRC_ADDRMAP5(0), 0x07070707 },
-	{ DDRC_ADDRMAP6(0), 0x07070707 },
-
-	/* performance setting */
-	{ DDRC_ODTCFG(0), 0x0b060908 },
-	{ DDRC_ODTMAP(0), 0x00000000 },
-	{ DDRC_SCHED(0), 0x29511505 },
-	{ DDRC_SCHED1(0), 0x0000002c },
-	{ DDRC_PERFHPR1(0), 0x5900575b },
-	/* 150T starve and 0x90 max tran len */
-	{ DDRC_PERFLPR1(0), 0x90000096 },
-	/* 300T starve and 0x10 max tran len */
-	{ DDRC_PERFWR1(0), 0x1000012c },
-	{ DDRC_DBG0(0), 0x00000016 },
-	{ DDRC_DBG1(0), 0x00000000 },
-	{ DDRC_DBGCMD(0), 0x00000000 },
-	{ DDRC_SWCTL(0), 0x00000001 },
-	{ DDRC_POISONCFG(0), 0x00000011 },
-	{ DDRC_PCCFG(0), 0x00000111 },
-	{ DDRC_PCFGR_0(0), 0x000010f3 },
-	{ DDRC_PCFGW_0(0), 0x000072ff },
-	{ DDRC_PCTRL_0(0), 0x00000001 },
-	/* disable Read Qos*/
-	{ DDRC_PCFGQOS0_0(0), 0x00000e00 },
-	{ DDRC_PCFGQOS1_0(0), 0x0062ffff },
-	/* disable Write Qos*/
-	{ DDRC_PCFGWQOS0_0(0), 0x00000e00 },
-	{ DDRC_PCFGWQOS1_0(0), 0x0000ffff },
-
-	/* Frequency 1: 400mbps */
-	{ DDRC_FREQ1_DRAMTMG0(0), 0x0d0b010c },
-	{ DDRC_FREQ1_DRAMTMG1(0), 0x00030410 },
-	{ DDRC_FREQ1_DRAMTMG2(0), 0x0305090c },
-	{ DDRC_FREQ1_DRAMTMG3(0), 0x00505006 },
-	{ DDRC_FREQ1_DRAMTMG4(0), 0x05040305 },
-	{ DDRC_FREQ1_DRAMTMG5(0), 0x0d0e0504 },
-	{ DDRC_FREQ1_DRAMTMG6(0), 0x0a060004 },
-	{ DDRC_FREQ1_DRAMTMG7(0), 0x0000090e },
-	{ DDRC_FREQ1_DRAMTMG14(0), 0x00000032 },
-	{ DDRC_FREQ1_DRAMTMG15(0), 0x00000000 },
-	{ DDRC_FREQ1_DRAMTMG17(0), 0x0036001b },
-	{ DDRC_FREQ1_DERATEINT(0), 0x7e9fbeb1 },
-	{ DDRC_FREQ1_DFITMG0(0), 0x03818200 },
-	{ DDRC_FREQ1_DFITMG2(0), 0x00000000 },
-	{ DDRC_FREQ1_RFSHTMG(0), 0x000C001c },
-	{ DDRC_FREQ1_INIT3(0), 0x00840000 },
-	{ DDRC_FREQ1_INIT4(0), 0x00310008 },
-	{ DDRC_FREQ1_INIT6(0), 0x0066004a },
-	{ DDRC_FREQ1_INIT7(0), 0x0006004a },
-
-	/* Frequency 2: 100mbps */
-	{ DDRC_FREQ2_DRAMTMG0(0), 0x0d0b010c },
-	{ DDRC_FREQ2_DRAMTMG1(0), 0x00030410 },
-	{ DDRC_FREQ2_DRAMTMG2(0), 0x0305090c },
-	{ DDRC_FREQ2_DRAMTMG3(0), 0x00505006 },
-	{ DDRC_FREQ2_DRAMTMG4(0), 0x05040305 },
-	{ DDRC_FREQ2_DRAMTMG5(0), 0x0d0e0504 },
-	{ DDRC_FREQ2_DRAMTMG6(0), 0x0a060004 },
-	{ DDRC_FREQ2_DRAMTMG7(0), 0x0000090e },
-	{ DDRC_FREQ2_DRAMTMG14(0), 0x00000032 },
-	{ DDRC_FREQ2_DRAMTMG17(0), 0x0036001b },
-	{ DDRC_FREQ2_DERATEINT(0), 0x7e9fbeb1 },
-	{ DDRC_FREQ2_DFITMG0(0), 0x03818200 },
-	{ DDRC_FREQ2_DFITMG2(0), 0x00000000 },
-	{ DDRC_FREQ2_RFSHTMG(0), 0x00030007 },
-	{ DDRC_FREQ2_INIT3(0), 0x00840000 },
-	{ DDRC_FREQ2_INIT4(0), 0x00310008 },
-	{ DDRC_FREQ2_INIT6(0), 0x0066004a },
-	{ DDRC_FREQ2_INIT7(0), 0x0006004a },
+    { 0x3d403024, 0x7e9fbeb1 },
+    { 0x3d403064, 0x30007 },
+	{ 0x3d4030dc, 0x840000 },
+	{ 0x3d4030e0, 0x310008 },
+	{ 0x3d4030e8, 0x66004a },
+	{ 0x3d4030ec, 0x06004a },
+	{ 0x3d403100, 0x0d0b010c },
+	{ 0x3d403104, 0x30410 },
+	{ 0x3d403108, 0x0305090c },
+	{ 0x3d40310c, 0x505006 },
+	{ 0x3d403110, 0x5040305 },
+	{ 0x3d403114, 0x0d0e0504 },
+	{ 0x3d403118, 0x0a060004 },
+	{ 0x3d40311c, 0x90e },
+	{ 0x3d403138, 0x32 },
+	{ 0x3d403144, 0x36001b },
+	{ 0x3d403190, 0x3818200 },
+	{ 0x3d4031b4, 0x000 },
+	
+	{ 0x3d400240, 0x0b060908 },
+	{ 0x3d400244, 0x0 },
+	{ 0x3d400250, 0x29511505 },
+	{ 0x3d400254, 0x2c },
+	{ 0x3d40025c, 0x5900575b },
+	{ 0x3d400264, 0x90000096 },
+	{ 0x3d40026c, 0x1000012c },
+	{ 0x3d400300, 0x16 },
+	{ 0x3d400304, 0x0 },
+	{ 0x3d40030c, 0x0 },
+	{ 0x3d400320, 0x1 },
+	{ 0x3d40036c, 0x11 },
+	{ 0x3d400400, 0x111 },
+	{ 0x3d400404, 0x10f3 },
+	{ 0x3d400408, 0x72ff },
+	{ 0x3d400490, 0x1 },
+	{ 0x3d400494, 0xe00 },
+	{ 0x3d400498, 0x62ffff },
+	{ 0x3d40049c, 0xe00 },
+	{ 0x3d4004a0, 0xffff },
 };
 
 /* PHY Initialize Configuration */
-struct dram_cfg_param lpddr4_ddrphy_cfg[] = {
+struct dram_cfg_param ddr_ddrphy_cfg[] = {
 	{ 0x20110, 0x02 },
 	{ 0x20111, 0x03 },
 	{ 0x20112, 0x04 },
@@ -251,11 +176,7 @@ struct dram_cfg_param lpddr4_ddrphy_cfg[] = {
 	{ 0x190204, 0x0 },
 	{ 0x290204, 0x0 },
 
-#ifdef WR_POST_EXT_3200
 	{ 0x20024, 0xeb },
-#else
-	{ 0x20024, 0xab },
-#endif
 	{ 0x2003a, 0x0 },
 	{ 0x120024, 0xab },
 	{ 0x2003a, 0x0 },
@@ -314,16 +235,16 @@ struct dram_cfg_param lpddr4_ddrphy_cfg[] = {
 	{ 0x213049, 0xfbe },
 	{ 0x213149, 0xfbe },
 
-	{ 0x43, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x1043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x2043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x3043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x4043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x5043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x6043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x7043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x8043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
-	{ 0x9043, ((LPDDR4_PHY_ADDR_RON << 5) | LPDDR4_PHY_ADDR_RON) },
+	{0x43,0x63},
+	{0x1043,0x63},
+	{0x2043,0x63},
+	{0x3043,0x63},
+	{0x4043,0x63},
+	{0x5043,0x63},
+	{0x6043,0x63},
+	{0x7043,0x63},
+	{0x8043,0x63},
+	{0x9043,0x63},
 
 	{ 0x20018, 0x3 },
 	{ 0x20075, 0x4 },
@@ -387,7 +308,7 @@ struct dram_cfg_param lpddr4_ddrphy_cfg[] = {
 };
 
 /* ddr phy trained csr */
-struct dram_cfg_param lpddr4_ddrphy_trained_csr[] = {
+struct dram_cfg_param ddr_ddrphy_trained_csr[] = {
 	{ 0x200b2, 0x0 },
 	{ 0x1200b2, 0x0 },
 	{ 0x2200b2, 0x0 },
@@ -1108,345 +1029,165 @@ struct dram_cfg_param lpddr4_ddrphy_trained_csr[] = {
 	{ 0x13730, 0x0 },
 	{ 0x13830, 0x0 },
 };
-
 /* P0 message block paremeter for training firmware */
-struct dram_cfg_param lpddr4_fsp0_cfg[] = {
+struct dram_cfg_param ddr_fsp0_cfg[] = {
 	{ 0xd0000, 0x0 },
-	{ 0x54000, 0x0 },
-	{ 0x54001, 0x0 },
-	{ 0x54002, 0x0 },
 	{ 0x54003, 0xc80 },
 	{ 0x54004, 0x2 },
-	{ 0x54005, ((LPDDR4_PHY_RON << 8) | LPDDR4_PHY_RTT) }, /* PHY Ron/Rtt */
-	{ 0x54006, LPDDR4_PHY_VREF_VALUE },
-	{ 0x54007, 0x0 },
+	{ 0x54005, 0x1e1e }, /* PHY Ron/Rtt */
+	{ 0x54006, 0x11 },
 	{ 0x54008, 0x131f },
-	{ 0x54009, LPDDR4_HDT_CTL_3200_1D },
-	{ 0x5400a, 0x0 },
+	{ 0x54009, 0xc8 },
 	{ 0x5400b, 0x2 },
-	{ 0x5400c, 0x0 },
-	{ 0x5400d, (LPDDR4_CATRAIN_3200_1d << 8) },
-	{ 0x5400e, 0x0 },
-	{ 0x5400f, 0x0 },
-	{ 0x54010, 0x0 },
-	{ 0x54011, 0x0 },
 	{ 0x54012, 0x310 },
-	{ 0x54013, 0x0 },
-	{ 0x54014, 0x0 },
-	{ 0x54015, 0x0 },
-	{ 0x54016, 0x0 },
-	{ 0x54017, 0x0 },
-	{ 0x54018, 0x0 },
-
 	{ 0x54019, 0x2dd4 },
-#ifdef WR_POST_EXT_3200
-	{ 0x5401a, (((LPDDR4_RON) << 3) | 0x3) },
-#else
-	{ 0x5401a, (((LPDDR4_RON) << 3) | 0x1) },
-#endif
-	{ 0x5401b, ((LPDDR4_VREF_VALUE_CA << 8) | (LPDDR4_RTT_CA_BANK0 << 4) | LPDDR4_RTT_DQ) },
-	{ 0x5401c, ((LPDDR4_VREF_VALUE_DQ_RANK0 << 8) | 0x08) },
-	{ 0x5401d, 0x0 },
-	{ 0x5401e, LPDDR4_MR22_RANK0 },
+	{ 0x5401a, 0x33 },
+	{ 0x5401b, 0x4d66 },
+	{ 0x5401c, 0x4d08 },
+	{ 0x5401e, 0x16 },
 	{ 0x5401f, 0x2dd4 },
-#ifdef WR_POST_EXT_3200
-	{ 0x54020, (((LPDDR4_RON) << 3) | 0x3) },
-#else
-	{ 0x54020, (((LPDDR4_RON) << 3) | 0x1) },
-#endif
-	{ 0x54021, ((LPDDR4_VREF_VALUE_CA << 8) | (LPDDR4_RTT_CA_BANK1 << 4) | LPDDR4_RTT_DQ) },
-	{ 0x54022, ((LPDDR4_VREF_VALUE_DQ_RANK1 << 8) | 0x08) },
-	{ 0x54023, 0x0 },
-	{ 0x54024, LPDDR4_MR22_RANK1 },
-
-	{ 0x54025, 0x0 },
-	{ 0x54026, 0x0 },
-	{ 0x54027, 0x0 },
-	{ 0x54028, 0x0 },
-	{ 0x54029, 0x0 },
-	{ 0x5402a, 0x0 },
+	{ 0x54020, 0x33 },
+	{ 0x54021, 0x4d66 },
+	{ 0x54022, 0x4d08 },
+	{ 0x54024, 0x16 },
 	{ 0x5402b, 0x1000 },
 	{ 0x5402c, 0x3 },
-	{ 0x5402d, 0x0 },
-	{ 0x5402e, 0x0 },
-	{ 0x5402f, 0x0 },
-	{ 0x54030, 0x0 },
-	{ 0x54031, 0x0 },
 	{ 0x54032, 0xd400 },
-#ifdef WR_POST_EXT_3200
-	{ 0x54033, ((((LPDDR4_RON) << 3) | 0x3) << 8) | 0x2d/*0x312d*/ },//MR3/MR2
-#else
-	{ 0x54033, ((((LPDDR4_RON) << 3) | 0x1) << 8) | 0x2d/*0x312d*/ },//MR3/MR2
-#endif
-	{ 0x54034, (((LPDDR4_RTT_CA_BANK0 << 4) | LPDDR4_RTT_DQ) << 8)/*0x4600*/ },//MR11/MR4
-	{ 0x54035, (0x0800 | LPDDR4_VREF_VALUE_CA)/*0x084d*/ },//self:0x284d//MR13/MR12
-	{ 0x54036, LPDDR4_VREF_VALUE_DQ_RANK0/*0x4d*/ },//MR16/MR14
-	{ 0x54037, (LPDDR4_MR22_RANK0 << 8)/*0x500*/ },
+	{ 0x54033, 0x332d },
+	{ 0x54034, 0x6600 },//MR11/MR4
+	{ 0x54035, 0x084d },//self:0x284d//MR13/MR12
+	{ 0x54036, 0x4d },//MR16/MR14
+	{ 0x54037, 0x1600 },
 	{ 0x54038, 0xd400 },//MR1
-#ifdef WR_POST_EXT_3200
-	{ 0x54039, ((((LPDDR4_RON) << 3) | 0x3) << 8) | 0x2d/*0x312d*/ },//MR3/MR2
-#else
-	{ 0x54039, ((((LPDDR4_RON) << 3) | 0x1) << 8) | 0x2d/*0x312d*/ },//MR3/MR2
-#endif
-	{ 0x5403a, (((LPDDR4_RTT_CA_BANK1 << 4) | LPDDR4_RTT_DQ) << 8)/*0x4600*/ },//MR11/MR4
-	{ 0x5403b, (0x0800 | LPDDR4_VREF_VALUE_CA)/*0x084d*/ },//self:0x284d//MR13/MR12
-	{ 0x5403c, LPDDR4_VREF_VALUE_DQ_RANK1/*0x4d*/ },//MR16/MR14
-	{ 0x5403d, (LPDDR4_MR22_RANK1 << 8)/*0x500*/ },
-	{ 0x5403d, (LPDDR4_MR22_RANK1 << 8)/*0x500*/ },//{ 0x5403d,0x500 },
-	{ 0x5403e, 0x0 },
-	{ 0x5403f, 0x0 },
-	{ 0x54040, 0x0 },
-	{ 0x54041, 0x0 },
-	{ 0x54042, 0x0 },
-	{ 0x54043, 0x0 },
-	{ 0x54044, 0x0 },
+	{ 0x54039, 0x332d },//MR3/MR2
+	{ 0x5403a, 0x6600 },//MR11/MR4
+	{ 0x5403b, 0x084d },//self:0x284d//MR13/MR12
+	{ 0x5403c, 0x4d },//MR16/MR14
+	{ 0x5403d, 0x1600 },
 	{ 0xd0000, 0x1 },
 };
 
 /* P1 message block paremeter for training firmware */
-struct dram_cfg_param lpddr4_fsp1_cfg[] = {
+struct dram_cfg_param ddr_fsp1_cfg[] = {
 	{ 0xd0000, 0x0 },
-	{ 0x54000, 0x0 },
-	{ 0x54001, 0x0 },
 	{ 0x54002, 0x101 },
 	{ 0x54003, 0x190 },
 	{ 0x54004, 0x2 },
-	{ 0x54005, ((LPDDR4_PHY_RON << 8) | LPDDR4_PHY_RTT)/*0x2828*/ },//PHY Ron/Rtt
-	{ 0x54006, LPDDR4_PHY_VREF_VALUE },
-	{ 0x54007, 0x0 },
-	{ 0x54008, LPDDR4_TRAIN_SEQ_400 },
-	{ 0x54009, LPDDR4_HDT_CTL_400_1D },
-	{ 0x5400a, 0x0 },
+	{ 0x54005, 0x1e1e },//PHY Ron/Rtt
+	{ 0x54006, 0x11 },
+	{ 0x54008, 0x121f },
+	{ 0x54009, 0xc8 },
 	{ 0x5400b, 0x2 },
-	{ 0x5400c, 0x0 },
-	{ 0x5400d, (LPDDR4_CATRAIN_400 << 8) },
-	{ 0x5400e, 0x0 },
-	{ 0x5400f, 0x0 },
-	{ 0x54010, 0x0 },
-	{ 0x54011, 0x0 },
 	{ 0x54012, 0x310 },
-	{ 0x54013, 0x0 },
-	{ 0x54014, 0x0 },
-	{ 0x54015, 0x0 },
-	{ 0x54016, 0x0 },
-	{ 0x54017, 0x0 },
-	{ 0x54018, 0x0 },
 	{ 0x54019, 0x84 },
-	{ 0x5401a, (((LPDDR4_RON) << 3) | 0x1)/*0x31*/ },//MR4/MR3
-	{ 0x5401b, ((LPDDR4_VREF_VALUE_CA << 8) |(LPDDR4_RTT_CA << 4) | LPDDR4_RTT_DQ)/*0x4d46*/ },//MR12/MR11
-	{ 0x5401c, ((LPDDR4_VREF_VALUE_DQ_RANK0 << 8) | 0x08)/*0x4d08*/ },//self:0x4d28//MR14/MR13
-	{ 0x5401d, 0x0 },
-	{ 0x5401e, LPDDR4_MR22_RANK0/*0x5*/ },
+	{ 0x5401a, 0x31 },
+	{ 0x5401b, 0x4d66 },//MR12/MR11
+	{ 0x5401c, 0x4d08 },//self:0x4d28//MR14/MR13
+	{ 0x5401e, 0x16 },
 	{ 0x5401f, 0x84 },
-	{ 0x54020, (((LPDDR4_RON) << 3) | 0x1)/*0x31*/ },//MR4/MR3
-	{ 0x54021, ((LPDDR4_VREF_VALUE_CA << 8) | (LPDDR4_RTT_CA << 4) | LPDDR4_RTT_DQ)/*0x4d46*/ },//MR12/MR11
-	{ 0x54022, ((LPDDR4_VREF_VALUE_DQ_RANK1 << 8) | 0x08)/*0x4d08*/ },//self:0x4d28//MR14/MR13
-	{ 0x54023, 0x0 },
-	{ 0x54024, LPDDR4_MR22_RANK1 },
-	{ 0x54025, 0x0 },
-	{ 0x54026, 0x0 },
-	{ 0x54027, 0x0 },
-	{ 0x54028, 0x0 },
-	{ 0x54029, 0x0 },
-	{ 0x5402a, 0x0 },
+	{ 0x54020, 0x31 },//MR4/MR3
+	{ 0x54021, 0x4d66 },//MR12/MR11
+	{ 0x54022, 0x4d08 },
+	{ 0x54024, 0x16 },
 	{ 0x5402b, 0x1000 },
 	{ 0x5402c, 0x3 },
-	{ 0x5402d, 0x0 },
-	{ 0x5402e, 0x0 },
-	{ 0x5402f, 0x0 },
-	{ 0x54030, 0x0 },
-	{ 0x54031, 0x0 },
 	{ 0x54032, 0x8400 },
-	{ 0x54033, ((((LPDDR4_RON) << 3) | 0x1) << 8) | 0x00 },
-	{ 0x54034, (((LPDDR4_RTT_CA << 4) | LPDDR4_RTT_DQ) << 8) },
-	{ 0x54035, (0x0800 | LPDDR4_VREF_VALUE_CA) },
-	{ 0x54036, LPDDR4_VREF_VALUE_DQ_RANK0 },
-	{ 0x54037, (LPDDR4_MR22_RANK0 << 8) },
+	{ 0x54033, 0x3100 },
+	{ 0x54034, 0x6600 },
+	{ 0x54035, 0x084d },
+	{ 0x54036, 0x4d },
+	{ 0x54037, 0x1600 },
 	{ 0x54038, 0x8400 },
-	{ 0x54039, ((((LPDDR4_RON) << 3) | 0x1) << 8) | 0x00 },
-	{ 0x5403a, (((LPDDR4_RTT_CA << 4) | LPDDR4_RTT_DQ) << 8) },
-	{ 0x5403b, (0x0800 | LPDDR4_VREF_VALUE_CA) },
-	{ 0x5403c, LPDDR4_VREF_VALUE_DQ_RANK1 },
-	{ 0x5403d, (LPDDR4_MR22_RANK1 << 8) },
-	{ 0x5403e, 0x0 },
-	{ 0x5403f, 0x0 },
-	{ 0x54040, 0x0 },
-	{ 0x54041, 0x0 },
-	{ 0x54042, 0x0 },
-	{ 0x54043, 0x0 },
-	{ 0x54044, 0x0 },
+	{ 0x54039, 0x3100 },
+	{ 0x5403a, 0x6600 },
+	{ 0x5403b, 0x084d },
+	{ 0x5403c, 0x4d },
+	{ 0x5403d, 0x1600 },
 	{ 0xd0000, 0x1 },
 };
 
 /* P2 message block paremeter for training firmware */
-struct dram_cfg_param lpddr4_fsp2_cfg[] = {
+struct dram_cfg_param ddr_fsp2_cfg[] = {
 	{ 0xd0000, 0x0 },
-	{ 0x54000, 0x0 },
-	{ 0x54001, 0x0 },
 	{ 0x54002, 0x102 },
 	{ 0x54003, 0x64 },
 	{ 0x54004, 0x2 },
-	{ 0x54005, ((LPDDR4_PHY_RON << 8) | LPDDR4_PHY_RTT) },
-	{ 0x54006, LPDDR4_PHY_VREF_VALUE },
-	{ 0x54007, 0x0 },
-	{ 0x54008, LPDDR4_TRAIN_SEQ_100 },
-	{ 0x54009, LPDDR4_HDT_CTL_100_1D },
-	{ 0x5400a, 0x0 },
+	{ 0x54005, 0x1e1e },
+	{ 0x54006, 0x11 },
+	{ 0x54008, 0x121f },
+	{ 0x54009, 0xc8 },
 	{ 0x5400b, 0x2 },
-	{ 0x5400c, 0x0 },
-	{ 0x5400d, (LPDDR4_CATRAIN_100 << 8) },
-	{ 0x5400e, 0x0 },
-	{ 0x5400f, 0x0 },
-	{ 0x54010, 0x0 },
-	{ 0x54011, 0x0 },
 	{ 0x54012, 0x310 },
-	{ 0x54013, 0x0 },
-	{ 0x54014, 0x0 },
-	{ 0x54015, 0x0 },
-	{ 0x54016, 0x0 },
-	{ 0x54017, 0x0 },
-	{ 0x54018, 0x0 },
 	{ 0x54019, 0x84 },
-	{ 0x5401a, (((LPDDR4_RON) << 3) | 0x1) },
-	{ 0x5401b, ((LPDDR4_VREF_VALUE_CA << 8) | (LPDDR4_RTT_CA << 4) | LPDDR4_RTT_DQ) },
-	{ 0x5401c, ((LPDDR4_VREF_VALUE_DQ_RANK0 << 8) | 0x08) },
-	{ 0x5401d, 0x0 },
-	{ 0x5401e, LPDDR4_MR22_RANK0 },
+	{ 0x5401a, 0x31 },
+	{ 0x5401b, 0x4d66 },
+	{ 0x5401c, 0x4d08 },
+	{ 0x5401e, 0x16 },
 	{ 0x5401f, 0x84 },
-	{ 0x54020, (((LPDDR4_RON) << 3) | 0x1) },
-	{ 0x54021, ((LPDDR4_VREF_VALUE_CA << 8) | (LPDDR4_RTT_CA << 4) | LPDDR4_RTT_DQ) },
-	{ 0x54022, ((LPDDR4_VREF_VALUE_DQ_RANK1 << 8) | 0x08) },
-	{ 0x54023, 0x0 },
-	{ 0x54024, LPDDR4_MR22_RANK1 },
-	{ 0x54025, 0x0 },
-	{ 0x54026, 0x0 },
-	{ 0x54027, 0x0 },
-	{ 0x54028, 0x0 },
-	{ 0x54029, 0x0 },
-	{ 0x5402a, 0x0 },
+	{ 0x54020, 0x31 },
+	{ 0x54021, 0x4d66 },
+	{ 0x54022, 0x4d08 },
+	{ 0x54024, 0x16 },
 	{ 0x5402b, 0x1000 },
 	{ 0x5402c, 0x3 },
-	{ 0x5402d, 0x0 },
-	{ 0x5402e, 0x0 },
-	{ 0x5402f, 0x0 },
-	{ 0x54030, 0x0 },
-	{ 0x54031, 0x0 },
 	{ 0x54032, 0x8400 },
-	{ 0x54033, ((((LPDDR4_RON) << 3) | 0x1 ) << 8) | 0x00 },
-	{ 0x54034, (((LPDDR4_RTT_CA << 4) | LPDDR4_RTT_DQ) << 8) },
-	{ 0x54035, (0x0800 | LPDDR4_VREF_VALUE_CA) },
-	{ 0x54036, LPDDR4_VREF_VALUE_DQ_RANK0 },
-	{ 0x54037, (LPDDR4_MR22_RANK0 << 8) },
+	{ 0x54033, 0x3100 },
+	{ 0x54034, 0x6600 },
+	{ 0x54035, 0x084d },
+	{ 0x54036, 0x4d },
+	{ 0x54037, 0x1600 },
 	{ 0x54038, 0x8400 },
-	{ 0x54039, ((((LPDDR4_RON) << 3) | 0x1) << 8) | 0x00 },
-	{ 0x5403a, (((LPDDR4_RTT_CA << 4) | LPDDR4_RTT_DQ) << 8) },
-	{ 0x5403b, (0x0800 | LPDDR4_VREF_VALUE_CA) },
-	{ 0x5403c, LPDDR4_VREF_VALUE_DQ_RANK1 },
-	{ 0x5403d, (LPDDR4_MR22_RANK1 << 8) },
-	{ 0x5403e, 0x0 },
-	{ 0x5403f, 0x0 },
-	{ 0x54040, 0x0 },
-	{ 0x54041, 0x0 },
-	{ 0x54042, 0x0 },
-	{ 0x54043, 0x0 },
-	{ 0x54044, 0x0 },
+	{ 0x54039, 0x3100 },
+	{ 0x5403a, 0x6600 },
+	{ 0x5403b, 0x084d },
+	{ 0x5403c, 0x4d },
+	{ 0x5403d, 0x1600 },
 	{ 0xd0000, 0x1 },
 };
 
 /* P0 2D message block paremeter for training firmware */
-struct dram_cfg_param lpddr4_fsp0_2d_cfg[] = {
+struct dram_cfg_param ddr_fsp0_2d_cfg[] = {
 	{ 0xd0000, 0x0 },
-	{ 0x54000, 0x0 },
-	{ 0x54001, 0x0 },
-	{ 0x54002, 0x0 },
 	{ 0x54003, 0xc80 },
 	{ 0x54004, 0x2 },
-	{ 0x54005, ((LPDDR4_PHY_RON << 8) | LPDDR4_PHY_RTT) },
-	{ 0x54006, LPDDR4_PHY_VREF_VALUE },
-	{ 0x54007, 0x0 },
+	{ 0x54005, 0x1e1e },
+	{ 0x54006, 17 },
 	{ 0x54008, 0x61 },
-	{ 0x54009, LPDDR4_HDT_CTL_2D },
-	{ 0x5400a, 0x0 },
+	{ 0x54009, 0xc8 },
 	{ 0x5400b, 0x2 },
-	{ 0x5400c, 0x0 },
-	{ 0x5400d, (LPDDR4_CATRAIN_3200_2d << 8) },
-	{ 0x5400e, 0x0 },
-	{ 0x5400f, (LPDDR4_2D_SHARE << 8) | 0x00 },
-	{ 0x54010, LPDDR4_2D_WEIGHT },
-	{ 0x54011, 0x0 },
+	{ 0x5400f, 0x100 },
+	{ 0x54010, 0x1f7f },
 	{ 0x54012, 0x310 },
-	{ 0x54013, 0x0 },
-	{ 0x54014, 0x0 },
-	{ 0x54015, 0x0 },
-	{ 0x54016, 0x0 },
-	{ 0x54017, 0x0 },
-	{ 0x54018, 0x0 },
 	{ 0x54019, 0x2dd4 },
-#ifdef WR_POST_EXT_3200
-	{ 0x5401a, (((LPDDR4_RON) << 3) | 0x3) },
-#else
-	{ 0x5401a, (((LPDDR4_RON) << 3) | 0x1) },
-#endif
-	{ 0x5401b, ((LPDDR4_VREF_VALUE_CA << 8) | (LPDDR4_RTT_CA_BANK0 << 4) | LPDDR4_RTT_DQ) },
-	{ 0x5401c, ((LPDDR4_VREF_VALUE_DQ_RANK0 << 8) | 0x08) },
-	{ 0x5401d, 0x0 },
-	{ 0x5401e, LPDDR4_MR22_RANK0 },
+	{ 0x5401a, 0x33 },
+
+	{ 0x5401b, 0x4d66 },
+	{ 0x5401c, 0x4d08 },
+	{ 0x5401e, 0x16 },
 	{ 0x5401f, 0x2dd4 },
-#ifdef WR_POST_EXT_3200
-	{ 0x54020, (((LPDDR4_RON) << 3) | 0x3) },
-#else
-	{ 0x54020, (((LPDDR4_RON) << 3) | 0x1) },
-#endif
-	{ 0x54021, ((LPDDR4_VREF_VALUE_CA << 8) | (LPDDR4_RTT_CA_BANK1 << 4) | LPDDR4_RTT_DQ) },
-	{ 0x54022, ((LPDDR4_VREF_VALUE_DQ_RANK1 << 8) | 0x08) },
-	{ 0x54023, 0x0 },
-	{ 0x54024, LPDDR4_MR22_RANK1 },
-	{ 0x54025, 0x0 },
-	{ 0x54026, 0x0 },
-	{ 0x54027, 0x0 },
-	{ 0x54028, 0x0 },
-	{ 0x54029, 0x0 },
-	{ 0x5402a, 0x0 },
+	{ 0x54020, 0x33 },
+	{ 0x54021, 0x4d66 },
+	{ 0x54022, 0x4d08 },
+	{ 0x54024, 0x16 },
 	{ 0x5402b, 0x1000 },
 	{ 0x5402c, 0x3 },
-	{ 0x5402d, 0x0 },
-	{ 0x5402e, 0x0 },
-	{ 0x5402f, 0x0 },
-	{ 0x54030, 0x0 },
-	{ 0x54031, 0x0 },
-
 	{ 0x54032, 0xd400 },
-#ifdef WR_POST_EXT_3200
-	{ 0x54033, ((((LPDDR4_RON) << 3) | 0x3) << 8) | 0x2d },
-#else
-	{ 0x54033, ((((LPDDR4_RON) << 3) | 0x1) << 8) | 0x2d },
-#endif
-	{ 0x54034, (((LPDDR4_RTT_CA_BANK0 << 4) | LPDDR4_RTT_DQ) << 8) },
-	{ 0x54035, (0x0800 | LPDDR4_VREF_VALUE_CA) },
-	{ 0x54036, LPDDR4_VREF_VALUE_DQ_RANK0 },
-	{ 0x54037, (LPDDR4_MR22_RANK0 << 8) },
+	{ 0x54033, 0x332d },
+	{ 0x54034, 0x6600 },
+	{ 0x54035, 0x084d },
+	{ 0x54036, 0x4d },
+	{ 0x54037, 0x1600 },
 	{ 0x54038, 0xd400 },
-#ifdef WR_POST_EXT_3200
-	{ 0x54039, ((((LPDDR4_RON) << 3) | 0x3) << 8) | 0x2d },
-#else
-	{ 0x54039, ((((LPDDR4_RON) << 3) | 0x1) << 8) | 0x2d },
-#endif
-	{ 0x5403a, (((LPDDR4_RTT_CA_BANK1 << 4) | LPDDR4_RTT_DQ) << 8) },
-	{ 0x5403b, (0x0800 | LPDDR4_VREF_VALUE_CA) },
-	{ 0x5403c, LPDDR4_VREF_VALUE_DQ_RANK1 },
-	{ 0x5403d, (LPDDR4_MR22_RANK1 << 8) },
-	{ 0x5403e, 0x0 },
-	{ 0x5403f, 0x0 },
-	{ 0x54040, 0x0 },
-	{ 0x54041, 0x0 },
-	{ 0x54042, 0x0 },
-	{ 0x54043, 0x0 },
-	{ 0x54044, 0x0 },
+	{ 0x54039, 0x332d },
+	{ 0x5403a, 0x6600 },
+	{ 0x5403b, 0x084d },
+	{ 0x5403c, 0x4d },
+	{ 0x5403d, 0x1600 },
 	{ 0xd0000, 0x1 },
 };
 
 /* DRAM PHY init engine image */
-struct dram_cfg_param lpddr4_phy_pie[] = {
+struct dram_cfg_param ddr_phy_pie[] = {
 	{ 0xd0000, 0x0 },
 	{ 0x90000, 0x10 },
 	{ 0x90001, 0x400 },
@@ -2034,51 +1775,51 @@ struct dram_cfg_param lpddr4_phy_pie[] = {
 	{ 0x138b4, 0x1 },
 	{ 0x2003a, 0x2 },
 	{ 0xc0080, 0x2 },
-	{ 0xd0000, 0x1 },
+	{ 0xd0000, 0x1 }
 };
 
-struct dram_fsp_msg lpddr4_dram_fsp_msg[] = {
+struct dram_fsp_msg ddr_dram_fsp_msg[] = {
 	{
 		/* P0 3200mts 1D */
 		.drate = 3200,
 		.fw_type = FW_1D_IMAGE,
-		.fsp_cfg = lpddr4_fsp0_cfg,
-		.fsp_cfg_num = ARRAY_SIZE(lpddr4_fsp0_cfg),
+		.fsp_cfg = ddr_fsp0_cfg,
+		.fsp_cfg_num = ARRAY_SIZE(ddr_fsp0_cfg),
 	},
 	{
 		/* P1 400mts 1D */
 		.drate = 400,
 		.fw_type = FW_1D_IMAGE,
-		.fsp_cfg = lpddr4_fsp1_cfg,
-		.fsp_cfg_num = ARRAY_SIZE(lpddr4_fsp1_cfg),
+		.fsp_cfg = ddr_fsp1_cfg,
+		.fsp_cfg_num = ARRAY_SIZE(ddr_fsp1_cfg),
 	},
 	{
-		/* P1 100mts 1D */
+		/* P2 100mts 1D */
 		.drate = 100,
 		.fw_type = FW_1D_IMAGE,
-		.fsp_cfg = lpddr4_fsp2_cfg,
-		.fsp_cfg_num = ARRAY_SIZE(lpddr4_fsp2_cfg),
+		.fsp_cfg = ddr_fsp2_cfg,
+		.fsp_cfg_num = ARRAY_SIZE(ddr_fsp2_cfg),
 	},
 	{
 		/* P0 3200mts 2D */
 		.drate = 3200,
 		.fw_type = FW_2D_IMAGE,
-		.fsp_cfg = lpddr4_fsp0_2d_cfg,
-		.fsp_cfg_num = ARRAY_SIZE(lpddr4_fsp0_2d_cfg),
+		.fsp_cfg = ddr_fsp0_2d_cfg,
+		.fsp_cfg_num = ARRAY_SIZE(ddr_fsp0_2d_cfg),
 	},
 };
 
-/* lpddr4 timing config params on EVK board */
+/* ddr timing config params */
 struct dram_timing_info dram_timing = {
-	.ddrc_cfg = lpddr4_ddrc_cfg,
-	.ddrc_cfg_num = ARRAY_SIZE(lpddr4_ddrc_cfg),
-	.ddrphy_cfg = lpddr4_ddrphy_cfg,
-	.ddrphy_cfg_num = ARRAY_SIZE(lpddr4_ddrphy_cfg),
-	.fsp_msg = lpddr4_dram_fsp_msg,
-	.fsp_msg_num = ARRAY_SIZE(lpddr4_dram_fsp_msg),
-	.ddrphy_trained_csr = lpddr4_ddrphy_trained_csr,
-	.ddrphy_trained_csr_num = ARRAY_SIZE(lpddr4_ddrphy_trained_csr),
-	.ddrphy_pie = lpddr4_phy_pie,
-	.ddrphy_pie_num = ARRAY_SIZE(lpddr4_phy_pie),
+	.ddrc_cfg = ddr_ddrc_cfg,
+	.ddrc_cfg_num = ARRAY_SIZE(ddr_ddrc_cfg),
+	.ddrphy_cfg = ddr_ddrphy_cfg,
+	.ddrphy_cfg_num = ARRAY_SIZE(ddr_ddrphy_cfg),
+	.fsp_msg = ddr_dram_fsp_msg,
+	.fsp_msg_num = ARRAY_SIZE(ddr_dram_fsp_msg),
+	.ddrphy_trained_csr = ddr_ddrphy_trained_csr,
+	.ddrphy_trained_csr_num = ARRAY_SIZE(ddr_ddrphy_trained_csr),
+	.ddrphy_pie = ddr_phy_pie,
+	.ddrphy_pie_num = ARRAY_SIZE(ddr_phy_pie),
 	.fsp_table = { 3200, 400, 100, },
 };
