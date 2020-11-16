@@ -181,7 +181,7 @@ static void parse_hw_config(struct hw_config *hw_conf)
 
 	fs_argv[0] = "ext2load";
 	fs_argv[1] = "mmc";
-	fs_argv[2] = "0:2";
+	fs_argv[2] = "0:3";
 	fs_argv[3] = file_addr;
 	fs_argv[4] = "boot/config.txt";
 
@@ -315,7 +315,7 @@ static int merge_dts_overlay(cmd_tbl_t *cmdtp, struct fdt_header *working_fdt, c
 	char *file_addr;
 	struct fdt_header *blob;
 	int ret;
-	char overlay_file[] = "boot/overlays/";
+	char overlay_file[MAX_OVERLAY_NAME_LENGTH] = "boot/overlays/";
 
 	static char *fs_argv[5];
 
@@ -335,7 +335,7 @@ static int merge_dts_overlay(cmd_tbl_t *cmdtp, struct fdt_header *working_fdt, c
 
 	fs_argv[0] = "ext2load";
 	fs_argv[1] = "mmc";
-	fs_argv[2] = "0:2";
+	fs_argv[2] = "0:3";
 	fs_argv[3] = file_addr;
 	fs_argv[4] = overlay_file;
 
