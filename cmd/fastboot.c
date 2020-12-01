@@ -12,6 +12,9 @@
 #include <console.h>
 #include <g_dnl.h>
 #include <usb.h>
+#include <asm/gpio.h>
+
+#define GPIO1_IO13 13
 
 static int do_fastboot(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 {
@@ -45,6 +48,9 @@ static int do_fastboot(cmd_tbl_t *cmdtp, int flag, int argc, char *const argv[])
 		ret = CMD_RET_FAILURE;
 		goto exit;
 	}
+
+	gpio_request(GPIO1_IO13, "SOC_READY");
+	gpio_direction_output(GPIO1_IO13, 0);
 
 	while (1) {
 		if (g_dnl_detach())
