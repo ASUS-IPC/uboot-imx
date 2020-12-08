@@ -131,6 +131,7 @@
 	"image=Image\0" \
 	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
 	"conf_addr=0x800000\0"			\
+	"cmdline_addr=0x900000\0"		\
 	"fdt_overlay_addr=0x42000000\0"		\
 	"fdt_addr=0x43000000\0"			\
 	"fdt_high=0xffffffffffffffff\0"		\
@@ -154,7 +155,6 @@
 		"else " \
 			"mmcmisc=\"misc=/dev/mmcblk1p2\"; " \
 		"fi; " \
-		"run mmcargs; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
 				"booti ${loadaddr} - ${fdt_addr}; " \

@@ -29,6 +29,154 @@ DECLARE_GLOBAL_DATA_PTR;
 #define debug_bootkeys(fmt, args...)		\
 	debug_cond(DEBUG_BOOTKEYS, fmt, ##args)
 
+static char bootargs[1024] = {0};
+
+static unsigned long hw_skip_comment(char *text)
+{
+	int i = 0;
+	if(*text == '#') {
+		while(*(text + i) != 0x00)
+		{
+			if(*(text + (i++)) == 0x0a)
+				break;
+		}
+	}
+	return i;
+}
+
+static unsigned long hw_skip_line(char *text)
+{
+	if(*text == 0x0a)
+		return 1;
+	else
+		return 0;
+}
+
+static unsigned long get_append(char *text)
+{
+	int i = 0;
+	int append_len = 0;
+	char append[1024] = {0};
+
+	while(*(text + i) != 0x00)
+	{
+		if(*(text + i) == 0x0a) {
+			append_len = i;
+			append[i] = 0x00;
+			i++;
+			break;
+		} else {
+			append[i] = *(text + i);
+			i++;
+		}
+	}
+
+	if (append_len)
+		strcat(bootargs, append);
+
+	env_set("bootargs", bootargs);
+
+	return i;
+}
+
+static void set_bootargs(void)
+{
+	char *jh_clk = env_get("jh_clk");
+	char *console = env_get("console");
+	char *mmcroot = env_get("mmcroot");
+	char *mmcdev = env_get("mmcdev");
+
+	if (jh_clk) {
+		if (*jh_clk != 0x20) {
+			strcat(bootargs, jh_clk);
+			strcat(bootargs, " ");
+		}
+	}
+
+	if (console) {
+		strcat(bootargs, "console=");
+		strcat(bootargs, console);
+		strcat(bootargs, " ");
+	}
+
+	if (mmcroot) {
+		strcat(bootargs, "root=");
+		strcat(bootargs, mmcroot);
+		strcat(bootargs, " ");
+	}
+
+	if (mmcdev) {
+		if (!strcmp(mmcdev, "0"))
+			strcat(bootargs, "misc=/dev/mmcblk0p2 ");
+		else if (!strcmp(mmcdev, "1"))
+			strcat(bootargs, "misc=/dev/mmcblk1p2 ");
+	}
+}
+
+static void parse_cmdline(void)
+{
+	unsigned long count, offset = 0, addr, size;
+	char *file_addr, *file_size;
+	static char *fs_argv[5];
+
+	int valid = 0;
+
+	file_addr = env_get("cmdline_addr");
+	if (!file_addr) {
+		printf("Can't get cmdline_addr address\n");
+		file_addr = "0x900000";
+	}
+
+	addr = simple_strtoul(file_addr, NULL, 16);
+	if (!addr)
+		printf("Can't set addr\n");
+
+	fs_argv[0] = "ext2load";
+	fs_argv[1] = "mmc";
+	fs_argv[2] = "0:3";
+	fs_argv[3] = file_addr;
+	fs_argv[4] = "boot/cmdline.txt";
+
+	if (do_ext2load(NULL, 0, 5, fs_argv)) {
+		printf("[cmdline] do_ext2load fail\n");
+		goto end;
+	}
+
+	file_size = env_get("filesize");
+	size = simple_strtoul(file_size, NULL, 16);
+	if (!size) {
+		printf("[cmdline] Can't get filesize\n");
+		goto end;
+	}
+
+	valid = 1;
+	printf("cmdline.txt size = %lu\n", size);
+
+	*((char *)addr + size) = 0x00;
+
+	while(offset != size)
+	{
+		count = hw_skip_comment((char *)(addr + offset));
+		if(count > 0) {
+			offset = offset + count;
+			continue;
+		}
+		count = hw_skip_line((char *)(addr + offset));
+		if(count > 0) {
+			offset = offset + count;
+			continue;
+		}
+		count = get_append((char *)(addr + offset));
+		if(count > 0) {
+			offset = offset + count;
+			continue;
+		}
+	}
+
+end:
+	printf("cmdline.txt valid = %d\n", valid);
+}
+
 /* Stored value of bootdelay, used by autoboot_command() */
 static int stored_bootdelay;
 
@@ -365,6 +513,11 @@ const char *bootdelay_process(void)
 void autoboot_command(const char *s)
 {
 	debug("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
+
+	set_bootargs();
+	parse_cmdline();
+	printf("bootargs: %s\n", bootargs);
+	env_set("bootargs", bootargs);
 
 	if (stored_bootdelay != -1 && s && !abortboot(stored_bootdelay)) {
 #if defined(CONFIG_AUTOBOOT_KEYED) && !defined(CONFIG_AUTOBOOT_KEYED_CTRLC)
