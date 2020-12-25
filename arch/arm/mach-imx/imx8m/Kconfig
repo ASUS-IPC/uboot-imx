@@ -44,6 +44,24 @@ config TARGET_IMX8MQ_AIY
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
 
+config TARGET_IMX8MQ_IMA
+	bool "imx8mq_ima"
+	select IMX8MQ
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+
+config TARGET_IMX8MQ_PE100A
+	bool "imx8mq_pe100a"
+	select IMX8MQ
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+
+config TARGET_IMX8MQ_PV100A
+	bool "imx8mq_pv100a"
+	select IMX8MQ
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+
 config TARGET_IMX8MM_DDR4_VAL
 	bool "imx8mm DDR4 validation board"
 	select IMX8MM
@@ -77,5 +95,9 @@ source "board/freescale/imx8mq_phanbell/Kconfig"
 source "board/freescale/imx8mq_aiy/Kconfig"
 source "board/freescale/imx8mm_evk/Kconfig"
 source "board/freescale/imx8mm_val/Kconfig"
+
+source "board/asus/imx8mq_ima/Kconfig"
+source "board/asus/imx8mq_pe100a/Kconfig"
+source "board/asus/imx8mq_pv100a/Kconfig"
 
 endif
