@@ -129,7 +129,6 @@
 	JAILHOUSE_ENV \
 	"script=boot.scr\0" \
 	"image=Image\0" \
-	"console=ttymxc0,115200 earlycon=ec_imx6q,0x30860000,115200\0" \
 	"conf_addr=0x800000\0"			\
 	"cmdline_addr=0x900000\0"		\
 	"fdt_overlay_addr=0x42000000\0"		\
