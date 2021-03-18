@@ -25,13 +25,27 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_b0;
+extern struct dram_timing_info dram_timing_samsung_4gb;
+
+#define DDR_SEL_GPIO    IMX_GPIO_NR(4, 29)
 
 void spl_dram_init(void)
 {
+	int ddr_sel = 0;
+
+	gpio_request(DDR_SEL_GPIO, "ddr_sel_gpio");
+	gpio_direction_input(DDR_SEL_GPIO);
+	ddr_sel = gpio_get_value(DDR_SEL_GPIO);
+
 	/* ddr init */
 	if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1) {
-		printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
-		ddr_init(&dram_timing);
+		if (!ddr_sel) {
+			printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
+			ddr_init(&dram_timing);
+		} else {
+			printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
+			ddr_init(&dram_timing_samsung_4gb);
+		}
 	} else {
 		ddr_init(&dram_timing_b0);
 	}
