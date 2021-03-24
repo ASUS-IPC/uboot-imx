@@ -25,13 +25,36 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_b0;
+extern struct dram_timing_info dram_timing_samsung_4gb;
+
+#define SKU_ID0_GPIO    IMX_GPIO_NR(4, 29)
+#define SKU_ID1_GPIO    IMX_GPIO_NR(4, 30)
+#define SKU_ID2_GPIO    IMX_GPIO_NR(4, 31)
 
 void spl_dram_init(void)
 {
+	int sku_id = 0;
+
+	gpio_request(SKU_ID0_GPIO, "sku_id0_gpio");
+	gpio_request(SKU_ID1_GPIO, "sku_id1_gpio");
+	gpio_request(SKU_ID2_GPIO, "sku_id2_gpio");
+	gpio_direction_input(SKU_ID0_GPIO);
+	gpio_direction_input(SKU_ID1_GPIO);
+	gpio_direction_input(SKU_ID2_GPIO);
+	sku_id = (gpio_get_value(SKU_ID2_GPIO) << 2) + (gpio_get_value(SKU_ID1_GPIO) << 1)
+			+ gpio_get_value(SKU_ID0_GPIO);
+
+	printf("spl_dram_init: sku_id = %d\n", sku_id);
+
 	/* ddr init */
 	if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1) {
-		printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
-		ddr_init(&dram_timing);
+		if (sku_id == 3 || sku_id == 4) {
+			printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
+			ddr_init(&dram_timing_samsung_4gb);
+		} else {
+			printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
+			ddr_init(&dram_timing);
+		}
 	} else {
 		ddr_init(&dram_timing_b0);
 	}
