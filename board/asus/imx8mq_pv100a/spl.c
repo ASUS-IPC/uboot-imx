@@ -22,6 +22,8 @@
 #include <mmc.h>
 #include <asm/arch/imx8m_ddr.h>
 
+//#define ENABLE_SS_MODULATION_DEPTH_DEBUG
+
 DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_b0;
@@ -29,9 +31,29 @@ extern struct dram_timing_info dram_timing_samsung_4gb;
 
 #define DDR_SEL_GPIO    IMX_GPIO_NR(4, 29)
 
+volatile int modDepth;
 void spl_dram_init(void)
 {
 	int ddr_sel = 0;
+#ifdef ENABLE_SS_MODULATION_DEPTH_DEBUG
+	char ch;
+
+	printf("Please input DRAM PLL Spectrum Spread modulation depth(0~7):\n");
+	printf("(0=0.25 1=0.5 2=0.75 3=1.0 4=1.5 5=2.0 6=3.0 7=4.0)\n");
+	printf("Your input:");
+	while(1){
+		ch=getc();
+		if(ch>='0' && ch<='7')
+		{
+			printf("%c\n",ch);
+			modDepth = ch-'0';
+			break;
+		}
+	}
+#else
+	modDepth = 2; //4=1.5 is default setting
+	printf("DRAM PLL Spectrum Spread modulation=0.75\n");
+#endif
 
 	gpio_request(DDR_SEL_GPIO, "ddr_sel_gpio");
 	gpio_direction_input(DDR_SEL_GPIO);
