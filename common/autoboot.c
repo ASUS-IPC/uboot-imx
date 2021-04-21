@@ -14,6 +14,7 @@
 #include <menu.h>
 #include <post.h>
 #include <u-boot/sha256.h>
+#include <asm/gpio.h>
 
 #ifdef is_boot_from_usb
 #include <environment.h>
@@ -28,6 +29,8 @@ DECLARE_GLOBAL_DATA_PTR;
 #endif
 #define debug_bootkeys(fmt, args...)		\
 	debug_cond(DEBUG_BOOTKEYS, fmt, ##args)
+
+#define GPIO5_IO04 132
 
 static char bootargs[1024] = {0};
 
@@ -513,6 +516,9 @@ const char *bootdelay_process(void)
 void autoboot_command(const char *s)
 {
 	debug("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
+
+	gpio_request(GPIO5_IO04, "EEPROM_WRITE_CONTROL");
+	gpio_direction_output(GPIO5_IO04, 1);
 
 	set_bootargs();
 	parse_cmdline();
