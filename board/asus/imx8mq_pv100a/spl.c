@@ -22,19 +22,22 @@
 #include <mmc.h>
 #include <asm/arch/imx8m_ddr.h>
 
+#include "sku_id.h"
+
 //#define ENABLE_SS_MODULATION_DEPTH_DEBUG
 
 DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_b0;
+extern struct dram_timing_info dram_timing_micron_2gb;
 extern struct dram_timing_info dram_timing_samsung_4gb;
 
-#define DDR_SEL_GPIO    IMX_GPIO_NR(4, 29)
-
 volatile int modDepth;
+
 void spl_dram_init(void)
 {
-	int ddr_sel = 0;
+	const int sku_id = get_sku_id();
+
 #ifdef ENABLE_SS_MODULATION_DEPTH_DEBUG
 	char ch;
 
@@ -55,18 +58,27 @@ void spl_dram_init(void)
 	printf("DRAM PLL Spectrum Spread modulation=0.75\n");
 #endif
 
-	gpio_request(DDR_SEL_GPIO, "ddr_sel_gpio");
-	gpio_direction_input(DDR_SEL_GPIO);
-	ddr_sel = gpio_get_value(DDR_SEL_GPIO);
-
 	/* ddr init */
 	if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1) {
-		if (!ddr_sel) {
-			printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
-			ddr_init(&dram_timing);
-		} else {
-			printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
-			ddr_init(&dram_timing_samsung_4gb);
+		switch (sku_id) {
+			case SKU_MICRON_4G:
+				printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
+				ddr_init(&dram_timing);
+				break;
+			case SKU_SAMSUNG_4G:
+				printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
+				ddr_init(&dram_timing_samsung_4gb);
+				break;
+			case SKU_MICRON_2G:
+				printf("spl_dram_init: init Micron 2g ddr.(RPA_v29)\n");
+				ddr_init(&dram_timing_micron_2gb);
+				break;
+			case SKU_SAMSUNG_2G://not support yet
+				printf("spl_dram_init: not support samsung 2g yet\n");
+			default:
+				//run 2gb setting default
+				ddr_init(&dram_timing_micron_2gb);
+				break;
 		}
 	} else {
 		ddr_init(&dram_timing_b0);

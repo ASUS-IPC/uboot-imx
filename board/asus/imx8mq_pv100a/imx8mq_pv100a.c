@@ -30,6 +30,8 @@
 #include <usb.h>
 #include <dwc3-uboot.h>
 
+#include "sku_id.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 #define QSPI_PAD_CTRL	(PAD_CTL_DSE2 | PAD_CTL_HYS)
@@ -93,14 +95,14 @@ int dram_init(void)
 {
 	/* rom_pointer[1] contains the size of TEE occupies */
 	if (rom_pointer[1])
-		gd->ram_size = PHYS_SDRAM_SIZE - rom_pointer[1];
+		gd->ram_size = get_ddr_size() - rom_pointer[1];
 	else
-		gd->ram_size = PHYS_SDRAM_SIZE;
+		gd->ram_size = get_ddr_size();
 
-#if CONFIG_NR_DRAM_BANKS > 1
-	gd->ram_size += PHYS_SDRAM_2_SIZE;
-#endif
+	if (get_dram_bank() > 1)
+		gd->ram_size += PHYS_SDRAM_2_SIZE;
 
+	printf("dram_init: ram_size = 0x%x\n", gd->ram_size);
 	return 0;
 }
 
@@ -108,14 +110,14 @@ int dram_init_banksize(void)
 {
 	gd->bd->bi_dram[0].start = PHYS_SDRAM;
 	if (rom_pointer[1])
-		gd->bd->bi_dram[0].size = PHYS_SDRAM_SIZE -rom_pointer[1];
+		gd->bd->bi_dram[0].size = get_ddr_size() -rom_pointer[1];
 	else
-		gd->bd->bi_dram[0].size = PHYS_SDRAM_SIZE;
+		gd->bd->bi_dram[0].size = get_ddr_size();
 
-#if CONFIG_NR_DRAM_BANKS > 1
-	gd->bd->bi_dram[1].start = PHYS_SDRAM_2;
-	gd->bd->bi_dram[1].size = PHYS_SDRAM_2_SIZE;
-#endif
+	if (get_dram_bank() > 1) {
+		gd->bd->bi_dram[1].start = PHYS_SDRAM_2;
+		gd->bd->bi_dram[1].size = PHYS_SDRAM_2_SIZE;
+	}
 
 	return 0;
 }
@@ -425,7 +427,7 @@ int get_imx8m_baseboard_id(void)
 phys_size_t get_effective_memsize(void)
 {
 	if (rom_pointer[1])
-		return (PHYS_SDRAM_SIZE - rom_pointer[1]);
+		return (get_ddr_size() - rom_pointer[1]);
 	else
-		return PHYS_SDRAM_SIZE;
+		return get_ddr_size();
 }
