@@ -424,17 +424,17 @@ static int abortboot_key_sequence(int bootdelay)
 	return abort;
 }
 
-static int abortboot_single_key(int bootdelay)
+static int abortboot_ctrlc_key(int bootdelay)
 {
 	int abort = 0;
 	unsigned long ts;
 
-	printf("Hit any key to stop autoboot: %2d ", bootdelay);
+	printf("Hit key to stop autoboot('CTRL+C'): %2d ", bootdelay);
 
 	/*
-	 * Check if key already pressed
+	 * Check if ctrl+c key already pressed
 	 */
-	if (tstc()) {	/* we got a key press	*/
+	if (ctrlc()) {		/* we got a ctrl+c key press	*/
 		getchar();	/* consume input	*/
 		puts("\b\b\b 0");
 		abort = 1;	/* don't auto boot	*/
@@ -445,12 +445,12 @@ static int abortboot_single_key(int bootdelay)
 		/* delay 1000 ms */
 		ts = get_timer(0);
 		do {
-			if (tstc()) {	/* we got a key press	*/
+			if (ctrlc()) {		/* we got a ctrl+c key press	*/
 				int key;
 
 				abort  = 1;	/* don't auto boot	*/
 				bootdelay = 0;	/* no more delay	*/
-				key = getchar();/* consume input	*/
+				key = 0x03;	/* ctrl+c key code	*/
 				if (IS_ENABLED(CONFIG_USE_AUTOBOOT_MENUKEY))
 					menukey = key;
 				break;
@@ -476,7 +476,7 @@ static int abortboot(int bootdelay)
 		if (IS_ENABLED(CONFIG_AUTOBOOT_KEYED))
 			abort = abortboot_key_sequence(bootdelay);
 		else
-			abort = abortboot_single_key(bootdelay);
+			abort = abortboot_ctrlc_key(bootdelay);
 	}
 
 	if (IS_ENABLED(CONFIG_SILENT_CONSOLE) && abort)
