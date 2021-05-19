@@ -441,6 +441,8 @@ static int abortboot(int bootdelay)
 {
 	int abort = 0;
 
+	run_command("mmc partconf-check 0 0 1 0", 0);
+
 	if (bootdelay >= 0) {
 		if (IS_ENABLED(CONFIG_AUTOBOOT_KEYED))
 			abort = abortboot_key_sequence(bootdelay);
