@@ -216,6 +216,7 @@
 
 #endif
 
+#define CONFIG_BCB_SUPPORT
 #define CONFIG_SERIAL_TAG
 #define CONFIG_FASTBOOT_USB_DEV 0
 
