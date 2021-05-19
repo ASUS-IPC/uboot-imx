@@ -31,10 +31,12 @@ extern struct dram_timing_info dram_timing_b0;
 static void spl_dram_init(void)
 {
 	/* ddr init */
-	if (soc_rev() >= CHIP_REV_2_1)
+	if (soc_rev() >= CHIP_REV_2_1) {
+		printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
 		ddr_init(&dram_timing);
-	else
+	} else {
 		ddr_init(&dram_timing_b0);
+	}
 }
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE)
