@@ -32,7 +32,7 @@ static void spl_dram_init(void)
 {
 	/* ddr init */
 	if (soc_rev() >= CHIP_REV_2_1) {
-		printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
+		printf("spl_dram_init: init Micron 4g ddr.(RPA_v29)\n");
 		ddr_init(&dram_timing);
 	} else {
 		ddr_init(&dram_timing_b0);
