@@ -127,10 +127,16 @@ static void set_bootargs(void)
 static void parse_cmdline(void)
 {
 	unsigned long count, offset = 0, addr, size;
-	char *file_addr, *file_size;
+	char *file_addr, *file_size, *mmcdev;
 	static char *fs_argv[5];
 
 	int valid = 0;
+
+	mmcdev = env_get("mmcdev");
+	if (!mmcdev) {
+		printf("Can't get mmcdev, default use eMMC\n");
+		mmcdev = "0";
+	}
 
 	file_addr = env_get("cmdline_addr");
 	if (!file_addr) {
@@ -144,7 +150,16 @@ static void parse_cmdline(void)
 
 	fs_argv[0] = "ext2load";
 	fs_argv[1] = "mmc";
-	fs_argv[2] = "0:3";
+
+	if (!strcmp(mmcdev, "0"))
+		fs_argv[2] = "0:3";
+	else if (!strcmp(mmcdev, "1"))
+		fs_argv[2] = "1:3";
+	else {
+		printf("Invalid mmcdev\n");
+		goto end;
+	}
+
 	fs_argv[3] = file_addr;
 	fs_argv[4] = "boot/cmdline.txt";
 

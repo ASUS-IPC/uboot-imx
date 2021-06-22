@@ -171,10 +171,16 @@ static unsigned long hw_parse_property(char *text, struct hw_config *hw_conf)
 static void parse_hw_config(struct hw_config *hw_conf)
 {
 	unsigned long count, offset = 0, addr, size;
-	char *file_addr, *file_size;
+	char *file_addr, *file_size, *mmcdev;
 	static char *fs_argv[5];
 
 	int valid = 0;
+
+	mmcdev = env_get("mmcdev");
+	if (!mmcdev) {
+		printf("Can't get mmcdev, default use eMMC.\n");
+		mmcdev = "0";
+	}
 
 	file_addr = env_get("conf_addr");
 	if (!file_addr) {
@@ -188,7 +194,16 @@ static void parse_hw_config(struct hw_config *hw_conf)
 
 	fs_argv[0] = "ext2load";
 	fs_argv[1] = "mmc";
-	fs_argv[2] = "0:3";
+
+	if (!strcmp(mmcdev, "0"))
+		fs_argv[2] = "0:3";
+	else if (!strcmp(mmcdev, "1"))
+		fs_argv[2] = "1:3";
+	else {
+		printf("Invalid mmcdev\n");
+		goto end;
+	}
+
 	fs_argv[3] = file_addr;
 	fs_argv[4] = "boot/config.txt";
 
@@ -319,12 +334,18 @@ static int fdt_valid(struct fdt_header **blobp)
 static int merge_dts_overlay(struct cmd_tbl *cmdtp, struct fdt_header *working_fdt, char *overlay_name)
 {
 	unsigned long addr;
-	char *file_addr;
+	char *file_addr, *mmcdev;
 	struct fdt_header *blob;
 	int ret;
 	char overlay_file[MAX_OVERLAY_NAME_LENGTH] = "boot/overlays/";
 
 	static char *fs_argv[5];
+
+	mmcdev = env_get("mmcdev");
+	if (!mmcdev) {
+		printf("Can't get mmcdev, default use eMMC\n");
+		mmcdev = "0";
+	}
 
 	file_addr = env_get("fdt_overlay_addr");
 	if (!file_addr) {
@@ -342,7 +363,16 @@ static int merge_dts_overlay(struct cmd_tbl *cmdtp, struct fdt_header *working_f
 
 	fs_argv[0] = "ext2load";
 	fs_argv[1] = "mmc";
-	fs_argv[2] = "0:3";
+
+	if (!strcmp(mmcdev, "0"))
+		fs_argv[2] = "0:3";
+	else if (!strcmp(mmcdev, "1"))
+		fs_argv[2] = "1:3";
+	else {
+		printf("Invalid mmcdev\n");
+		goto fail;
+	}
+
 	fs_argv[3] = file_addr;
 	fs_argv[4] = overlay_file;
 
