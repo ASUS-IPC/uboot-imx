@@ -70,7 +70,7 @@ void spl_dram_init(void)
 				ddr_init(&dram_timing_samsung_4gb);
 				break;
 			case SKU_MICRON_2G:
-				printf("spl_dram_init: init Micron 2g ddr.(RPA_v29)\n");
+				printf("spl_dram_init: init Micron 2g ddr.(from Micron 4g ddr)\n");
 				ddr_init(&dram_timing_micron_2gb);
 				break;
 			case SKU_SAMSUNG_2G://not support yet
