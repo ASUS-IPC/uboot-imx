@@ -62,6 +62,12 @@ config TARGET_IMX8MQ_PV100A
 	select SUPPORT_SPL
 	select IMX8M_LPDDR4
 
+config TARGET_IMX8MQ_PV100A_2G
+	bool "imx8mq_pv100a_2g"
+	select IMX8MQ
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+
 config TARGET_IMX8MM_DDR4_VAL
 	bool "imx8mm DDR4 validation board"
 	select IMX8MM
