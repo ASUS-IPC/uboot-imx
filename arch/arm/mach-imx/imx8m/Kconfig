@@ -65,8 +65,18 @@ config TARGET_IMX8MQ_PE100A
 	select IMX8MQ
 	select IMX8M_LPDDR4
 
+config TARGET_IMX8MQ_PE100A_2G
+	bool "imx8mq_pe100a_2g"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+
 config TARGET_IMX8MQ_PV100A
 	bool "imx8mq_pv100a"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+
+config TARGET_IMX8MQ_PV100A_2G
+	bool "imx8mq_pv100a_2g"
 	select IMX8MQ
 	select IMX8M_LPDDR4
 
