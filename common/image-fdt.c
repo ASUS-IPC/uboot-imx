@@ -22,6 +22,7 @@
 #include <mapmem.h>
 #include <asm/io.h>
 #include <tee/optee.h>
+#include <stdlib.h>
 
 #ifndef CONFIG_SYS_FDT_PAD
 #define CONFIG_SYS_FDT_PAD 0x3000
