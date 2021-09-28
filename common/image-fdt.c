@@ -18,6 +18,7 @@
 #include <linux/libfdt.h>
 #include <mapmem.h>
 #include <asm/io.h>
+#include <stdlib.h>
 
 #ifndef CONFIG_SYS_FDT_PAD
 #define CONFIG_SYS_FDT_PAD 0x3000
