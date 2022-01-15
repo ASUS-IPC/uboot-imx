@@ -56,8 +56,6 @@ obj-$(CONFIG_TARGET_P5040DS)		+= ics307_clk.o
 obj-$(CONFIG_VSC_CROSSBAR)    += vsc3316_3308.o
 obj-$(CONFIG_IDT8T49N222A)	+= idt8t49n222a_serdes_clk.o
 obj-$(CONFIG_ZM7300)		+= zm7300.o
-obj-$(CONFIG_POWER_PFUZE100)	+= pfuze.o
-obj-$(CONFIG_DM_PMIC_PFUZE100)	+= pfuze.o
 obj-$(CONFIG_POWER_MC34VR500)	+= mc34vr500.o
 obj-$(CONFIG_MXC_EPDC)		+= epdc_setup.o
 ifneq (,$(filter $(SOC), mx25 mx31 mx35 mx5 mx6 mx7 mx7ulp imx8 imx8m vf610 imx8ulp))

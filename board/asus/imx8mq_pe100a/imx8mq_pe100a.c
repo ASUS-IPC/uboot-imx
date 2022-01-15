@@ -24,9 +24,8 @@
 #include <spl.h>
 #include <linux/bitops.h>
 #include <power/pmic.h>
-#include <power/pfuze100_pmic.h>
+#include <power/bd71837.h>
 #include "../common/tcpc.h"
-#include "../common/pfuze.h"
 #include <usb.h>
 #include <dwc3-uboot.h>
 
