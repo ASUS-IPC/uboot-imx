@@ -180,14 +180,15 @@ int power_init_board(void)
 	}
 
 	/* decrease RESET key long push time from the default 10s to 10ms */
-	pmic_reg_write(p, BD71837_PWRONCONFIG1, 0x0);
+	pmic_reg_write(p, BD718XX_PWRONCONFIG1, 0x0);
 
 	/* unlock the PMIC regs */
-	pmic_reg_write(p, BD71837_REGLOCK, 0x1);
+	pmic_reg_write(p, BD718XX_REGLOCK, 0x1);
 
 	/* Set BUCK5 output for DRAM to 1.0V */
 	/* 0.70,0.80,0.90,1.00, 1.05,1.10,1.20,1.35 */
-	pmic_reg_write(p, BD71837_BUCK5_VOLT, 0x3);
+	//pmic_reg_write(p, BD71837_BUCK5_VOLT, 0x3);
+	pmic_reg_write(p, BD718XX_1ST_NODVS_BUCK_VOLT, 0x3);
 
 	/* Set BUCK3 output for VDD_GPU_0V9 to 1.0V */
 	/* 0.7-1.3 (10mVstep) */
@@ -199,14 +200,14 @@ int power_init_board(void)
 
 	/* Set BUCK2 output for VDD_ARM_0V9 to 1.0V */
 	/* 0.7-1.3 (10mVstep) */
-	pmic_reg_write(p, BD71837_BUCK2_VOLT_RUN, 0x1E);
+	pmic_reg_write(p, BD718XX_BUCK2_VOLT_RUN, 0x1E);
 
 	/* Set BUCK1 output for VDD_SOC_0V9 to 0.95V */
 	/* 0.7-1.3 (10mVstep) */
-	pmic_reg_write(p, BD71837_BUCK1_VOLT_RUN, 0x19);
+	pmic_reg_write(p, BD718XX_BUCK1_VOLT_RUN, 0x19);
 
 	/* lock the PMIC regs */
-	pmic_reg_write(p, BD71837_REGLOCK, 0x11);
+	pmic_reg_write(p, BD718XX_REGLOCK, 0x11);
 	printf("end BD71837 power init ---------\n");
 	return 0;
 }
