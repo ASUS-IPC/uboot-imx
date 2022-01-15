@@ -67,6 +67,33 @@ config TARGET_IMX8MQ_EVK
 	select MISC
 	select SPL_CRYPTO_SUPPORT if SPL
 
+config TARGET_IMX8MQ_IMA
+	bool "imx8mq_ima"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select MISC
+	select SPL_CRYPTO_SUPPORT if SPL
+
+config TARGET_IMX8MQ_PE100A
+	bool "imx8mq_pe100a"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select MISC
+	select SPL_CRYPTO_SUPPORT if SPL
+
+config TARGET_IMX8MQ_PV100A
+	bool "imx8mq_pv100a"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select MISC
+	select SPL_CRYPTO_SUPPORT if SPL
+
 config TARGET_IMX8MQ_PHANBELL
         bool "imx8mq_phanbell"
         select IMX8MQ
@@ -277,4 +304,7 @@ source "board/beacon/imx8mn/Kconfig"
 source "board/phytec/phycore_imx8mm/Kconfig"
 source "board/phytec/phycore_imx8mp/Kconfig"
 
+source "board/asus/imx8mq_ima/Kconfig"
+source "board/asus/imx8mq_pe100a/Kconfig"
+source "board/asus/imx8mq_pv100a/Kconfig"
 endif

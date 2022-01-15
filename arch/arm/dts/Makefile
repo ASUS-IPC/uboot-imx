@@ -871,6 +871,9 @@ dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mq-ddr3l-val.dtb \
 	imx8mq-ddr4-val.dtb \
 	imx8mq-evk.dtb \
+	imx8mq-ima.dtb \
+	imx8mq-pe100a.dtb \
+	imx8mq-pv100a.dtb \
 	imx8mm-beacon-kit.dtb \
 	imx8mn-beacon-kit.dtb \
 	imx8mq-phanbell.dtb \

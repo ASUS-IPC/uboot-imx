@@ -1,0 +1,14 @@
+if TARGET_IMX8MQ_IMA
+
+config SYS_BOARD
+	default "imx8mq_ima"
+
+config SYS_VENDOR
+	default "asus"
+
+config SYS_CONFIG_NAME
+	default "imx8mq_ima"
+
+source "board/freescale/common/Kconfig"
+
+endif
