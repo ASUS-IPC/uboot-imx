@@ -15,6 +15,8 @@
 #include <usb.h>
 #include <watchdog.h>
 #include <linux/stringify.h>
+#include <asm/gpio.h>
+#define GPIO1_IO13 13
 
 static int do_fastboot_udp(int argc, char *const argv[],
 			   uintptr_t buf_addr, size_t buf_size)
@@ -82,6 +84,9 @@ static int do_fastboot_usb(int argc, char *const argv[],
 		ret = CMD_RET_FAILURE;
 		goto exit;
 	}
+
+	gpio_request(GPIO1_IO13, "SOC_READY");
+	gpio_direction_output(GPIO1_IO13, 0);
 
 	while (1) {
 		if (g_dnl_detach())
