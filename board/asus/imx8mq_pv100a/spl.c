@@ -29,20 +29,46 @@
 #include <power/pmic.h>
 #include <power/bd71837.h>
 #include <spl.h>
-#include <asm/arch/imx8mq_sec_def.h>
+#include "sku_id.h"
 #include <asm/arch/imx8m_csu.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_b0;
+extern struct dram_timing_info dram_timing_micron_2gb;
+extern struct dram_timing_info dram_timing_samsung_4gb;
 
 static void spl_dram_init(void)
 {
+	const int sku_id = get_sku_id();
+
 	/* ddr init */
-	if (soc_rev() >= CHIP_REV_2_1)
-		ddr_init(&dram_timing);
-	else
+	if (soc_rev() >= CHIP_REV_2_1) {
+		switch (sku_id) {
+			case SKU_MICRON_4G:
+				printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
+				ddr_init(&dram_timing);
+				break;
+			case SKU_SAMSUNG_4G:
+				printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
+				ddr_init(&dram_timing_samsung_4gb);
+				break;
+			case SKU_MICRON_2G:
+				printf("spl_dram_init: init Micron 2g ddr.(from Micron 4g ddr)\n");
+				ddr_init(&dram_timing_micron_2gb);
+				break;
+			case SKU_SAMSUNG_2G://not support yet
+				printf("spl_dram_init: not support samsung 2g yet\n");
+			default:
+				//run 2gb setting default
+				printf("spl_dram_init: not support sku_id(%d), init Micron 2g ddr."
+						"(from Micron 4g ddr)\n", sku_id);
+				ddr_init(&dram_timing_micron_2gb);
+				break;
+		}
+	} else {
 		ddr_init(&dram_timing_b0);
+	}
 }
 
 #define I2C_PAD_CTRL	(PAD_CTL_DSE6 | PAD_CTL_HYS | PAD_CTL_PUE)
