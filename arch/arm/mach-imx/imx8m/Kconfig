@@ -210,6 +210,16 @@ config TARGET_IMX8MP_EVK
 	select MISC
 	select SPL_CRYPTO_SUPPORT if SPL
 
+config TARGET_IMX8MP_BLIZZARD
+	bool "imx8mp_blizzard LPDDR4 EVK board"
+	select IMX8MP
+	select SUPPORT_SPL
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select MISC
+	select SPL_CRYPTO_SUPPORT if SPL
+	
 config TARGET_PICO_IMX8MQ
 	bool "Support Technexion Pico iMX8MQ"
 	select IMX8MQ
@@ -325,4 +335,5 @@ source "board/phytec/phycore_imx8mp/Kconfig"
 source "board/asus/imx8mq_ima/Kconfig"
 source "board/asus/imx8mq_pe100a/Kconfig"
 source "board/asus/imx8mq_pv100a/Kconfig"
+source "board/asus/imx8mp_blizzard/Kconfig"
 endif
