@@ -85,8 +85,10 @@ static int do_fastboot_usb(int argc, char *const argv[],
 		goto exit;
 	}
 
+	#ifndef CONFIG_TARGET_IMX8MP_BLIZZARD
 	gpio_request(GPIO1_IO13, "SOC_READY");
 	gpio_direction_output(GPIO1_IO13, 0);
+	#endif
 
 	while (1) {
 		if (g_dnl_detach())
