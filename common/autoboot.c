@@ -565,8 +565,10 @@ void autoboot_command(const char *s)
 {
 	debug("### main_loop: bootcmd=\"%s\"\n", s ? s : "<UNDEFINED>");
 
+	#ifndef CONFIG_TARGET_IMX8MP_BLIZZARD
 	gpio_request(GPIO5_IO04, "EEPROM_WRITE_CONTROL");
 	gpio_direction_output(GPIO5_IO04, 1);
+	#endif
 
 	set_bootargs();
 	parse_cmdline();
