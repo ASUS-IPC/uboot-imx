@@ -1,5 +1,11 @@
 menu "Boot timing"
 
+config SPLASH_SOURCE
+	bool "drawing splash logo from source"
+	default y
+	help
+	  drawing splash logo from source
+
 config BOOTSTAGE
 	bool "Boot timing and reporting"
 	help

@@ -85,6 +85,9 @@
 	"image=Image\0" \
 	"splashpos=m,m\0" \
 	"splashimage=0x50000000\0" \
+	"splashsource=mmc_fs\0" \
+	"splashfile=logo.bmp\0" \
+	"splashdevpart=3\0 " \
 	"conf_addr=0x40000000\0"			\
 	"cmdline_addr=0x41000000\0"		\
 	"fdt_overlay_addr=0x42000000\0"		\
