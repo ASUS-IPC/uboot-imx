@@ -28,3 +28,18 @@ int mmc_get_env_dev(void)
 
 	return board_mmc_get_env_dev(devno);
 }
+
+int is_boot_from_sd(void)
+{
+	struct bootrom_sw_info **p =
+		(struct bootrom_sw_info **)(ulong)ROM_SW_INFO_ADDR;
+	int devno = (*p)->boot_dev_instance;
+	u8 boot_type = (*p)->boot_dev_type;
+
+	printf("is_boot_from_sd boot_type=%d , devno =%d \n", boot_type, devno);
+	if (boot_type  == BOOT_TYPE_SD)
+		return 1;
+	else
+		return 0;
+}
+

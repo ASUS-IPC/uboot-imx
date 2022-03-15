@@ -2,6 +2,12 @@ source "common/Kconfig.boot"
 
 menu "Console"
 
+config SPLASH_SOURCE
+	bool "drawing splash logo from source"
+	default y
+	help
+	  drawing splash logo from source
+
 config MENU
 	bool
 	help

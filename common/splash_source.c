@@ -118,7 +118,7 @@ static int splash_select_fs_dev(struct splash_location *location)
 
 	switch (location->storage) {
 	case SPLASH_STORAGE_MMC:
-		res = fs_set_blk_dev("mmc", location->devpart, FS_TYPE_ANY);
+		res = fs_set_blk_dev("mmc", location->devpart, FS_TYPE_EXT);
 		break;
 	case SPLASH_STORAGE_USB:
 		res = fs_set_blk_dev("usb", location->devpart, FS_TYPE_ANY);
@@ -293,6 +293,7 @@ static struct splash_location *select_splash_location(
 	if (env_splashsource == NULL)
 		return &locations[0];
 
+printf("select_splash_location env_splashsource=%s\n", env_splashsource);
 	for (i = 0; i < size; i++) {
 		if (!strcmp(locations[i].name, env_splashsource))
 			return &locations[i];
@@ -409,6 +410,7 @@ int splash_source_load(struct splash_location *locations, uint size)
 	struct splash_location *splash_location;
 	char *env_splashimage_value;
 	u32 bmp_load_addr;
+	char *splash_devpart;
 
 	env_splashimage_value = env_get("splashimage");
 	if (env_splashimage_value == NULL)
@@ -423,6 +425,22 @@ int splash_source_load(struct splash_location *locations, uint size)
 	splash_location = select_splash_location(locations, size);
 	if (!splash_location)
 		return -EINVAL;
+
+	printf("splash_source_load splash_location->flags=%d devpart=%s \n", splash_location->flags,splash_location->devpart);
+	#ifndef CONFIG_TARGET_IMX8MP_BLIZZARD
+	splash_location->devpart[0] = is_boot_from_sd() ? '1' : '0';
+	#else
+	splash_location->devpart[0] = '2';
+	#endif
+
+	splash_devpart = env_get("splashdevpart");
+	if (splash_devpart != NULL) {
+		printf("splashdevpart =%s\n", splash_devpart);
+		splash_location->devpart[2] = splash_devpart[0];
+	} else {
+		printf("splashdevpart is null\n");
+	}
+	printf("splash_source_loaddevpart=%s \n", splash_location->devpart);
 
 	if (splash_location->flags == SPLASH_STORAGE_RAW)
 		return splash_load_raw(splash_location, bmp_load_addr);

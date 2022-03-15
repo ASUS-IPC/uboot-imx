@@ -82,11 +82,22 @@ static inline int splash_video_logo_load(void) { return -ENOSYS; }
 
 __weak int splash_screen_prepare(void)
 {
-	if (CONFIG_IS_ENABLED(SPLASH_SOURCE))
-		return splash_source_load(default_splash_locations,
-					  ARRAY_SIZE(default_splash_locations));
+	int res = 0;
 
-	return splash_video_logo_load();
+	#ifdef CONFIG_SPLASH_SOURCE
+		res = splash_source_load(default_splash_locations,
+				ARRAY_SIZE(default_splash_locations));
+		if (res != 0)  {
+			printf(" splash_source_load fail\n");
+			return splash_video_logo_load();
+		} else {
+			printf(" splash_source_load successfule\n");
+			return res;
+		}
+
+	#else
+		return splash_video_logo_load();
+	#endif
 }
 
 #ifdef CONFIG_SPLASH_SCREEN_ALIGN
