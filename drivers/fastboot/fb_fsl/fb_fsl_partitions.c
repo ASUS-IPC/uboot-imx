@@ -352,6 +352,10 @@ bool fastboot_parts_is_raw(struct fastboot_ptentry *ptn)
 		else if (!strncmp(ptn->name, FASTBOOT_PARTITION_MISC,
 			strlen(FASTBOOT_PARTITION_MISC)))
 			return true;
+
+		else if (!strncmp(ptn->name, FASTBOOT_PARTITION_MISC_UBUNTU,
+			strlen(FASTBOOT_PARTITION_MISC_UBUNTU)))
+			return true;
 	}
 
 	 return false;

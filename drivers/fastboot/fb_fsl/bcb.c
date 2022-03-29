@@ -128,8 +128,13 @@ int bcb_rw_block(bool bread, char **ppblock,
 	blk_end = (offset + size)/blk_size;
 	block_cnt = 1 + (blk_end - blk_begin);
 
-	sprintf(devpart_str, "0x%x:0x%x", mmc_id,
-			fastboot_flash_find_index(FASTBOOT_PARTITION_MISC));
+	if (fastboot_flash_find_index(FASTBOOT_PARTITION_MISC) == -1) {
+		sprintf(devpart_str, "0x%x:0x%x", mmc_id,
+				fastboot_flash_find_index(FASTBOOT_PARTITION_MISC_UBUNTU));
+	} else {
+		sprintf(devpart_str, "0x%x:0x%x", mmc_id,
+				fastboot_flash_find_index(FASTBOOT_PARTITION_MISC));
+	}
 	sprintf(block_begin_str, "0x%x", blk_begin);
 	sprintf(cnt_str, "0x%x", block_cnt);
 
