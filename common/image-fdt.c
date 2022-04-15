@@ -38,6 +38,12 @@ struct hw_config
 {
 	int valid;
 
+	int uart1;
+	int i2c2, i2c3;
+	int pwm3, pwm4;
+	int sai2;
+	int ecspi2;
+
 	int fec1;
 
 	int overlay_count;
@@ -65,6 +71,100 @@ static unsigned long hw_skip_line(char *text)
 		return 0;
 }
 
+static unsigned long get_intf_value(char *text, struct hw_config *hw_conf)
+{
+	int i = 0;
+	if (memcmp(text, "uart1=", 6) == 0) {
+		i = 6;
+		if(memcmp(text + i, "on", 2) == 0) {
+			hw_conf->uart1 = 1;
+			i = i + 2;
+		} else if(memcmp(text + i, "off", 3) == 0) {
+			hw_conf->uart1 = -1;
+			i = i + 3;
+		} else
+			goto invalid_line;
+	} else if (memcmp(text, "i2c2=", 5) == 0) {
+		i = 5;
+		if(memcmp(text + i, "on", 2) == 0) {
+			hw_conf->i2c2 = 1;
+			i = i + 2;
+		} else if(memcmp(text + i, "off", 3) == 0) {
+			hw_conf->i2c2 = -1;
+			i = i + 3;
+		} else
+			goto invalid_line;
+	} else if (memcmp(text, "i2c3=", 5) == 0) {
+		i = 5;
+		if(memcmp(text + i, "on", 2) == 0) {
+			hw_conf->i2c3 = 1;
+			i = i + 2;
+		} else if(memcmp(text + i, "off", 3) == 0) {
+			hw_conf->i2c3 = -1;
+			i = i + 3;
+		} else
+			goto invalid_line;
+	} else if (memcmp(text, "pwm3=", 5) == 0) {
+		i = 5;
+		if(memcmp(text + i, "on", 2) == 0) {
+			hw_conf->pwm3 = 1;
+			i = i + 2;
+		} else if(memcmp(text + i, "off", 3) == 0) {
+			hw_conf->pwm3 = -1;
+			i = i + 3;
+		} else
+			goto invalid_line;
+	} else if (memcmp(text, "pwm4=", 5) == 0) {
+		i = 5;
+		if(memcmp(text + i, "on", 2) == 0) {
+			hw_conf->pwm4 = 1;
+			i = i + 2;
+		} else if(memcmp(text + i, "off", 3) == 0) {
+			hw_conf->pwm4 = -1;
+			i = i + 3;
+		} else
+			goto invalid_line;
+	} else if (memcmp(text, "sai2=", 5) == 0) {
+		i = 5;
+		if(memcmp(text + i, "on", 2) == 0) {
+			hw_conf->sai2 = 1;
+			i = i + 2;
+		} else if(memcmp(text + i, "off", 3) == 0) {
+			hw_conf->sai2 = -1;
+			i = i + 3;
+		} else
+			goto invalid_line;
+	} else if (memcmp(text, "ecspi2=", 7) == 0) {
+		i = 7;
+		if(memcmp(text + i, "on", 2) == 0) {
+			hw_conf->ecspi2 = 1;
+			i = i + 2;
+		} else if(memcmp(text + i, "off", 3) == 0) {
+			hw_conf->ecspi2 = -1;
+			i = i + 3;
+		} else
+			goto invalid_line;
+	} else
+		goto invalid_line;
+
+	while(*(text + i) != 0x00)
+	{
+		if(*(text + (i++)) == 0x0a)
+			break;
+	}
+	return i;
+
+invalid_line:
+	//It's not a legal line, skip it.
+	//printf("get_value: illegal line\n");
+	while(*(text + i) != 0x00)
+	{
+		if(*(text + (i++)) == 0x0a)
+			break;
+	}
+	return i;
+}
+
 static unsigned long get_conf_value(char *text, struct hw_config *hw_conf)
 {
 	int i = 0;
@@ -87,6 +187,7 @@ static unsigned long get_conf_value(char *text, struct hw_config *hw_conf)
 		if(*(text + (i++)) == 0x0a)
 			break;
 	}
+	return i;
 
 invalid_line:
 	//It's not a legal line, skip it.
@@ -145,7 +246,10 @@ static unsigned long get_overlay(char *text, struct hw_config *hw_conf)
 static unsigned long hw_parse_property(char *text, struct hw_config *hw_conf)
 {
 	int i = 0;
-	if(memcmp(text, "conf:",  5) == 0) {
+	if (memcmp(text, "intf:", 5) == 0) {
+		i = 5;
+		i = i + get_intf_value(text + i, hw_conf);
+	} else if (memcmp(text, "conf:",  5) == 0) {
 		i = 5;
 		i = i + get_conf_value(text + i, hw_conf);
 	} else if(memcmp(text, "overlay=",  8) == 0) {
@@ -397,7 +501,7 @@ fail:
 
 static void handle_hw_conf(cmd_tbl_t *cmdtp, struct fdt_header *working_fdt, struct hw_config *hw_conf)
 {
-	if(working_fdt == NULL)
+	if (working_fdt == NULL)
 		return;
 
 #ifdef CONFIG_OF_LIBFDT_OVERLAY
@@ -411,6 +515,41 @@ static void handle_hw_conf(cmd_tbl_t *cmdtp, struct fdt_header *working_fdt, str
 		free(hw_conf->overlay_file[i]);
 	}
 #endif
+
+	if (hw_conf->uart1 == 1)
+		set_hw_property(working_fdt, "/serial@30860000", "status", "okay", 5);
+	else if (hw_conf->uart1 == -1)
+		set_hw_property(working_fdt, "/serial@30860000", "status", "disabled", 9);
+
+	if (hw_conf->i2c2 == 1)
+		set_hw_property(working_fdt, "/i2c@30a30000", "status", "okay", 5);
+	else if (hw_conf->i2c2 == -1)
+		set_hw_property(working_fdt, "/i2c@30a30000", "status", "disabled", 9);
+
+	if (hw_conf->i2c3 == 1)
+		set_hw_property(working_fdt, "/i2c@30a40000", "status", "okay", 5);
+	else if (hw_conf->i2c3 == -1)
+		set_hw_property(working_fdt, "/i2c@30a40000", "status", "disabled", 9);
+
+	if (hw_conf->pwm3 == 1)
+		set_hw_property(working_fdt, "/pwm@30680000", "status", "okay", 5);
+	else if (hw_conf->pwm3 == -1)
+		set_hw_property(working_fdt, "/pwm@30680000", "status", "disabled", 9);
+
+	if (hw_conf->pwm4 == 1)
+		set_hw_property(working_fdt, "/pwm@30690000", "status", "okay", 5);
+	else if (hw_conf->pwm4 == -1)
+		set_hw_property(working_fdt, "/pwm@30690000", "status", "disabled", 9);
+
+	if (hw_conf->sai2 == 1)
+		set_hw_property(working_fdt, "/sai@308b0000", "status", "okay", 5);
+	else if (hw_conf->sai2 == -1)
+		set_hw_property(working_fdt, "/sai@308b0000", "status", "disabled", 9);
+
+	if (hw_conf->ecspi2 == 1)
+		set_hw_property(working_fdt, "/ecspi@30830000", "status", "okay", 5);
+	else if (hw_conf->ecspi2 == -1)
+		set_hw_property(working_fdt, "/ecspi@30830000", "status", "disabled", 9);
 
 	if (hw_conf->fec1 == 1)
 		set_hw_property(working_fdt, "/ethernet@30be0000", "wakeup-enable", "1", 2);
@@ -515,6 +654,13 @@ int boot_relocate_fdt(struct lmb *lmb, char **of_flat_tree, ulong *of_size)
 	printf("config.txt valid = %d\n", hw_conf.valid);
 	if(hw_conf.valid == 1) {
 		printf("config on: 1, config off: -1, no config: 0\n");
+		printf("intf.uart1 = %d\n", hw_conf.uart1);
+		printf("intf.i2c2 = %d\n", hw_conf.i2c2);
+		printf("intf.i2c3 = %d\n", hw_conf.i2c3);
+		printf("intf.pwm3 = %d\n", hw_conf.pwm3);
+		printf("intf.pwm4 = %d\n", hw_conf.pwm4);
+		printf("intf.sai2 = %d\n", hw_conf.sai2);
+		printf("intf.ecspi2 = %d\n", hw_conf.ecspi2);
 		printf("conf.eth_wakeup = %d\n", hw_conf.fec1);
 
 		for (int i = 0; i < hw_conf.overlay_count; i++)
