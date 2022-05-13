@@ -64,6 +64,7 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 
 void spl_dram_init(void)
 {
+	puts("spl_dram_init: Micron 6GB (IMX8MP_RPA_V7)\n");
 	ddr_init(&dram_timing);
 }
 
