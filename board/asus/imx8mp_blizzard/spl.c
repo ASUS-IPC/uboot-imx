@@ -34,6 +34,8 @@
 #include <mmc.h>
 #include <asm/arch/ddr.h>
 
+#include "sku_id.h"
+
 DECLARE_GLOBAL_DATA_PTR;
 
 int spl_board_boot_device(enum boot_device boot_dev_spl)
@@ -62,10 +64,27 @@ int spl_board_boot_device(enum boot_device boot_dev_spl)
 #endif
 }
 
+extern struct dram_timing_info dram_timing_micron_2gb;
+
 void spl_dram_init(void)
 {
-	puts("spl_dram_init: Micron 6GB (IMX8MP_RPA_V7)\n");
-	ddr_init(&dram_timing);
+	const int sku_id = get_sku_id();
+
+	switch (sku_id) {
+		case SKU_MICRON_2G:
+			printf("spl_dram_init: Micron 2GB (IMX8MP_RPA_V7)\n");
+			ddr_init(&dram_timing_micron_2gb);
+			break;
+		case SKU_MICRON_6G:
+			printf("spl_dram_init: Micron 6GB (IMX8MP_RPA_V7)\n");
+			ddr_init(&dram_timing);
+			break;
+		default:
+			//run 2gb setting default
+			printf("spl_dram_init: not support sku_id(%d), init Micron 2GB\n", sku_id);
+			ddr_init(&dram_timing_micron_2gb);
+			break;
+	}
 }
 
 #if CONFIG_IS_ENABLED(DM_PMIC_PCA9450)

@@ -212,15 +212,21 @@
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		SZ_32M
 
-/* Totally 6GB DDR */
 #define CONFIG_SYS_SDRAM_BASE		0x40000000
 #define PHYS_SDRAM			0x40000000
+#if defined(CONFIG_TARGET_IMX8MP_BLIZZARD)
+/* Totally 6GB DDR */
 #define PHYS_SDRAM_SIZE			0xC0000000	/* 3 GB */
 #define PHYS_SDRAM_2			0x100000000
 #ifdef CONFIG_TARGET_IMX8MP_DDR4_EVK
 #define PHYS_SDRAM_2_SIZE		0x40000000	/* 1 GB */
 #else
 #define PHYS_SDRAM_2_SIZE		0xC0000000	/* 3 GB */
+#endif
+#elif defined(CONFIG_TARGET_IMX8MP_BLIZZARD_2G)
+#define PHYS_SDRAM_SIZE			0x80000000	/* 2 GB */
+#else
+#define PHYS_SDRAM_SIZE			0x80000000	/* 2 GB */
 #endif
 
 #define CONFIG_MXC_UART_BASE		UART2_BASE_ADDR
