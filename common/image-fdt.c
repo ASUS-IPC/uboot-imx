@@ -152,6 +152,7 @@ static unsigned long get_intf_value(char *text, struct hw_config *hw_conf)
 		if(*(text + (i++)) == 0x0a)
 			break;
 	}
+	return i;
 
 invalid_line:
 	//It's not a legal line, skip it.
@@ -186,6 +187,7 @@ static unsigned long get_conf_value(char *text, struct hw_config *hw_conf)
 		if(*(text + (i++)) == 0x0a)
 			break;
 	}
+	return i;
 
 invalid_line:
 	//It's not a legal line, skip it.
