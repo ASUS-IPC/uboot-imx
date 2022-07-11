@@ -156,6 +156,7 @@ static unsigned long get_intf_value(char *text, struct hw_config *hw_conf)
 		if(*(text + (i++)) == 0x0a)
 			break;
 	}
+	return i;
 
 invalid_line:
 	//It's not a legal line, skip it.
@@ -190,6 +191,7 @@ static unsigned long get_conf_value(char *text, struct hw_config *hw_conf)
 		if(*(text + (i++)) == 0x0a)
 			break;
 	}
+	return i;
 
 invalid_line:
 	//It's not a legal line, skip it.
@@ -519,44 +521,44 @@ static void handle_hw_conf(cmd_tbl_t *cmdtp, struct fdt_header *working_fdt, str
 #endif
 
 	if (hw_conf->uart1 == 1)
-		set_hw_property(working_fdt, "/serial@30860000", "status", "okay", 5);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/serial@30860000", "status", "okay", 5);
 	else if (hw_conf->uart1 == -1)
-		set_hw_property(working_fdt, "/serial@30860000", "status", "disabled", 9);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/serial@30860000", "status", "disabled", 9);
 
 	if (hw_conf->i2c2 == 1)
-		set_hw_property(working_fdt, "/i2c@30a30000", "status", "okay", 5);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/i2c@30a30000", "status", "okay", 5);
 	else if (hw_conf->i2c2 == -1)
-		set_hw_property(working_fdt, "/i2c@30a30000", "status", "disabled", 9);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/i2c@30a30000", "status", "disabled", 9);
 
 	if (hw_conf->i2c3 == 1)
-		set_hw_property(working_fdt, "/i2c@30a40000", "status", "okay", 5);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/i2c@30a40000", "status", "okay", 5);
 	else if (hw_conf->i2c3 == -1)
-		set_hw_property(working_fdt, "/i2c@30a40000", "status", "disabled", 9);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/i2c@30a40000", "status", "disabled", 9);
 
 	if (hw_conf->pwm3 == 1)
-		set_hw_property(working_fdt, "/pwm@30680000", "status", "okay", 5);
+		set_hw_property(working_fdt, "/soc@0/bus@30400000/pwm@30680000", "status", "okay", 5);
 	else if (hw_conf->pwm3 == -1)
-		set_hw_property(working_fdt, "/pwm@30680000", "status", "disabled", 9);
+		set_hw_property(working_fdt, "/soc@0/bus@30400000/pwm@30680000", "status", "disabled", 9);
 
 	if (hw_conf->pwm4 == 1)
-		set_hw_property(working_fdt, "/pwm@30690000", "status", "okay", 5);
+		set_hw_property(working_fdt, "/soc@0/bus@30400000/pwm@30690000", "status", "okay", 5);
 	else if (hw_conf->pwm4 == -1)
-		set_hw_property(working_fdt, "/pwm@30690000", "status", "disabled", 9);
+		set_hw_property(working_fdt, "/soc@0/bus@30400000/pwm@30690000", "status", "disabled", 9);
 
 	if (hw_conf->sai2 == 1)
-		set_hw_property(working_fdt, "/sai@308b0000", "status", "okay", 5);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/sai@308b0000", "status", "okay", 5);
 	else if (hw_conf->sai2 == -1)
-		set_hw_property(working_fdt, "/sai@308b0000", "status", "disabled", 9);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/sai@308b0000", "status", "disabled", 9);
 
 	if (hw_conf->ecspi2 == 1)
-		set_hw_property(working_fdt, "/spi@30830000", "status", "okay", 5);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/spi@30830000", "status", "okay", 5);
 	else if (hw_conf->ecspi2 == -1)
-		set_hw_property(working_fdt, "/spi@30830000", "status", "disabled", 9);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/spi@30830000", "status", "disabled", 9);
 
 	if (hw_conf->fec1 == 1)
-		set_hw_property(working_fdt, "/ethernet@30be0000", "wakeup-enable", "1", 2);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/ethernet@30be0000", "wakeup-enable", "1", 2);
 	else if (hw_conf->fec1 == -1)
-		set_hw_property(working_fdt, "/ethernet@30be0000", "wakeup-enable", "0", 2);
+		set_hw_property(working_fdt, "/soc@0/bus@30800000/ethernet@30be0000", "wakeup-enable", "0", 2);
 
 }
 
