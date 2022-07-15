@@ -369,6 +369,57 @@ static int set_hw_property(struct fdt_header *working_fdt, char *path, char *pro
 	return 0;
 }
 
+static int flash_gpio(struct fdt_header *working_fdt, char *path, char *property)
+{
+	int offset, len;;
+	const fdt32_t *cell;
+
+	int MX8MQ_IOMUXC_UART1_RXD_GPIO5_IO22[5] = {564, 1180, 0, 5, 0};
+	int MX8MQ_IOMUXC_UART1_TXD_GPIO5_IO23[5] = {568, 1184, 0, 5, 0};
+
+	int MX8MQ_IOMUXC_SAI3_RXC_GPIO4_IO29[6] = {464, 1080, 0, 5, 0, 25};
+
+	printf("flash_gpio: %s %s\n", path, property);
+
+	offset = fdt_path_offset (working_fdt, path);
+	if (offset < 0) {
+		printf("libfdt fdt_path_offset() returned %s\n", fdt_strerror(offset));
+		return -1;
+	}
+
+	cell = fdt_getprop(working_fdt, offset, property, &len);
+	if (!cell) {
+		printf("libfdt fdt_getprop() fail\n");
+		return -1;
+	} else {
+		int i, j;
+		uint32_t adj_val;
+		int get_uart1rxd, get_uart1txd;
+
+		for (i = 0; i < len; i++) {
+			get_uart1rxd = 1;
+			get_uart1txd = 1;
+
+			for (j = 0; j < 5; j++) {
+				if (fdt32_to_cpu(cell[i + j]) != MX8MQ_IOMUXC_UART1_RXD_GPIO5_IO22[j])
+					get_uart1rxd = 0;
+				if (fdt32_to_cpu(cell[i + j]) != MX8MQ_IOMUXC_UART1_TXD_GPIO5_IO23[j])
+					get_uart1txd = 0;
+			}
+
+			if (get_uart1rxd || get_uart1txd) {
+				for (j = 0; j < 6; j++) {
+					adj_val = MX8MQ_IOMUXC_SAI3_RXC_GPIO4_IO29[j];
+					adj_val = cpu_to_fdt32(adj_val);
+					fdt_setprop_inplace_namelen_partial(working_fdt, offset, property, strlen(property), (i+j)*4, &adj_val, sizeof(adj_val));
+				}
+                        }
+		}
+	}
+
+	return 0;
+}
+
 static struct fdt_header *resize_working_fdt(void)
 {
 	struct fdt_header *working_fdt;
@@ -551,6 +602,8 @@ static void handle_hw_conf(cmd_tbl_t *cmdtp, struct fdt_header *working_fdt, str
 		set_hw_property(working_fdt, "/serial@30860000", "status", "okay", 5);
 	else if (hw_conf->uart1 == -1)
 		set_hw_property(working_fdt, "/serial@30860000", "status", "disabled", 9);
+	if (hw_conf->uart1 != -1)
+		flash_gpio(working_fdt, "/iomuxc@30330000/imx8mq-evk/hoggrp", "fsl,pins");
 
 	if (hw_conf->ecspi2 == 1)
 		set_hw_property(working_fdt, "/ecspi@30830000", "status", "okay", 5);
