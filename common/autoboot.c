@@ -579,7 +579,9 @@ void autoboot_command(const char *s)
 	gpio_direction_output(GPIO1_IO08, 1);
 	gpio_free(GPIO1_IO08);
 
-	#ifdef CONFIG_TARGET_IMX8MP_BLIZZARD
+	#if defined (CONFIG_TARGET_IMX8MP_BLIZZARD) || \
+		defined (CONFIG_TARGET_IMX8MP_BLIZZARD_2G) || \
+		defined (CONFIG_TARGET_IMX8MP_BLIZZARD_4G)
 	gpio_request(GPIO4_IO25, "SOM_KEEP_ALIVE");
 	gpio_direction_output(GPIO4_IO25, 1);
 	#endif
