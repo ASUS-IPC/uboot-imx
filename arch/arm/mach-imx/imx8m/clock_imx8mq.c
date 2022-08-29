@@ -599,14 +599,14 @@ void dram_disable_bypass(void)
 }
 
 #ifdef CONFIG_SPL_BUILD
-#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G)
+#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G) || defined(CONFIG_TARGET_IMX8MQ_P100IVM)
 extern volatile int modDepth;
 #endif
 void dram_pll_init(enum dram_pll_out_val pll_val)
 {
 	u32 val;
 	void __iomem *pll_control_reg = &ana_pll->dram_pll_cfg0;
-#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G)
+#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G) || defined(CONFIG_TARGET_IMX8MQ_P100IVM)
 	void __iomem *pll_cfg_reg1 = &ana_pll->dram_pll_cfg1;
 #endif
 	void __iomem *pll_cfg_reg2 = &ana_pll->dram_pll_cfg2;
@@ -615,7 +615,7 @@ void dram_pll_init(enum dram_pll_out_val pll_val)
 	setbits_le32(pll_control_reg, SSCG_PLL_BYPASS1_MASK);
 	setbits_le32(pll_control_reg, SSCG_PLL_BYPASS2_MASK);
 
-#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G)
+#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G) || defined(CONFIG_TARGET_IMX8MQ_P100IVM)
 	val = readl(pll_cfg_reg1);
 	printf("pll_cfg_reg1(before)=0x%x\n",val);
 	val &= ~0x1ff;
@@ -631,7 +631,7 @@ void dram_pll_init(enum dram_pll_out_val pll_val)
 			 SSCG_PLL_FEEDBACK_DIV_F1_MASK | SSCG_PLL_REF_DIVR2_MASK);
 		val |= SSCG_PLL_OUTPUT_DIV_VAL(0);
 		val |= SSCG_PLL_FEEDBACK_DIV_F2_VAL(11);
-#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G)
+#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G) || defined(CONFIG_TARGET_IMX8MQ_P100IVM)
 		val |= SSCG_PLL_FEEDBACK_DIV_F1_VAL(9);
 #else
 		val |= SSCG_PLL_FEEDBACK_DIV_F1_VAL(39);
@@ -645,7 +645,7 @@ void dram_pll_init(enum dram_pll_out_val pll_val)
 			 SSCG_PLL_FEEDBACK_DIV_F1_MASK | SSCG_PLL_REF_DIVR2_MASK);
 		val |= SSCG_PLL_OUTPUT_DIV_VAL(1);
 
-#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G)
+#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G) || defined(CONFIG_TARGET_IMX8MQ_P100IVM)
 		val |= SSCG_PLL_FEEDBACK_DIV_F2_VAL(8);
 		val |= SSCG_PLL_FEEDBACK_DIV_F1_VAL(9);
 #else
@@ -661,7 +661,7 @@ void dram_pll_init(enum dram_pll_out_val pll_val)
 			 SSCG_PLL_FEEDBACK_DIV_F1_MASK | SSCG_PLL_REF_DIVR2_MASK);
 		val |= SSCG_PLL_OUTPUT_DIV_VAL(1);
 		val |= SSCG_PLL_FEEDBACK_DIV_F2_VAL(11);
-#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G)
+#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G) || defined(CONFIG_TARGET_IMX8MQ_P100IVM)
 		val |= SSCG_PLL_FEEDBACK_DIV_F1_VAL(9);
 #else
 		val |= SSCG_PLL_FEEDBACK_DIV_F1_VAL(39);
@@ -670,7 +670,7 @@ void dram_pll_init(enum dram_pll_out_val pll_val)
 		writel(val, pll_cfg_reg2);
 		break;
 	case DRAM_PLL_OUT_167M:
-#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G)
+#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G) || defined(CONFIG_TARGET_IMX8MQ_P100IVM)
 		val = readl(pll_cfg_reg1);
 		val &= ~0x1;
 		writel(val, pll_cfg_reg1);
@@ -688,7 +688,7 @@ void dram_pll_init(enum dram_pll_out_val pll_val)
 		break;
 	}
 
-#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G)
+#if defined(CONFIG_TARGET_IMX8MQ_PV100A) || defined(CONFIG_TARGET_IMX8MQ_PV100A_2G) || defined(CONFIG_TARGET_IMX8MQ_P100IVM)
 	printf("pll_cfg_reg2=0x%x\n",val);
 #endif
 	/* Clear power down bit */
