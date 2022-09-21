@@ -580,8 +580,10 @@ void autoboot_command(const char *s)
 	gpio_direction_output(GPIO1_IO08, 1);
 	gpio_free(GPIO1_IO08);
 
-	printf("Trigger RTL9010 PHY Reset pin.\n");
+	printf("Trigger RTL9010ARG PHY Reset pin.\n");
 	gpio_request(GPIO4_IO20, "RTL9010_RESET");
+	gpio_direction_output(GPIO4_IO20, 1);
+	mdelay(600);
 	gpio_direction_output(GPIO4_IO20, 0);
 	mdelay(10);
 	gpio_direction_output(GPIO4_IO20, 1);
