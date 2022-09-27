@@ -80,6 +80,7 @@ int get_dram_bank(void)
 	switch (sku_id) {
 		case SKU_MICRON_4G:
 		case SKU_SAMSUNG_4G:
+		case SKU_IVM_MICRON_4G:
 			bank = 2;
 			break;
 		case SKU_MICRON_2G:
@@ -101,6 +102,7 @@ phys_size_t get_ddr_size(void) {
 	switch (sku_id) {
 		case SKU_MICRON_4G:
 		case SKU_SAMSUNG_4G:
+		case SKU_IVM_MICRON_4G:
 			ram_size = k3Gb;// two bank support(3Gb+1Gb)
 			break;
 		case SKU_MICRON_2G:

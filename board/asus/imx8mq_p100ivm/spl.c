@@ -62,6 +62,7 @@ void spl_dram_init(void)
 	if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1) {
 		switch (sku_id) {
 			case SKU_MICRON_4G:
+			case SKU_IVM_MICRON_4G
 				printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
 				ddr_init(&dram_timing);
 				break;
