@@ -73,6 +73,51 @@ config TARGET_IMX8MQ_EVK
 	select ARCH_MISC_INIT
 	select SPL_CRYPTO if SPL
 
+config TARGET_IMX8MQ_IMA
+	bool "imx8mq_ima"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+
+config TARGET_IMX8MQ_PE100A
+	bool "imx8mq_pe100a"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+
+config TARGET_IMX8MQ_PE100A_2G
+	bool "imx8mq_pe100a_2g"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+	
+config TARGET_IMX8MQ_pv100a
+	bool "imx8mq_pv100a"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+	
+config TARGET_IMX8MQ_pv100a_2G
+	bool "imx8mq_pv100a_2g"
+	select IMX8MQ
+	select IMX8M_LPDDR4
+	select FSL_CAAM
+	select FSL_BLOB
+	select ARCH_MISC_INIT
+	select SPL_CRYPTO if SPL
+
 config TARGET_IMX8MQ_PHANBELL
 	bool "imx8mq_phanbell"
 	select BINMAN
@@ -367,4 +412,7 @@ source "board/variscite/imx8mn_var_som/Kconfig"
 source "board/toradex/verdin-imx8mm/Kconfig"
 source "board/toradex/verdin-imx8mp/Kconfig"
 
+source "board/asus/imx8mq_ima/Kconfig"
+source "board/asus/imx8mq_pe100a/Kconfig"
+source "board/asus/imx8mq_pv100a/Kconfig"
 endif
