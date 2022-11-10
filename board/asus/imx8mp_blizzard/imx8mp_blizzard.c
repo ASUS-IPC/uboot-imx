@@ -470,6 +470,9 @@ int board_init(void)
 	return 0;
 }
 
+#define PCB_ID_0_GPIO IMX_GPIO_NR(4, 2)
+#define PCB_ID_1_GPIO IMX_GPIO_NR(4, 3)
+
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_IS_IN_MMC
@@ -478,6 +481,49 @@ int board_late_init(void)
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	env_set("board_name", "EVK");
 	env_set("board_rev", "iMX8MP");
+
+	int ret, pcbid = -1;
+
+	ret = gpio_request(PCB_ID_0_GPIO, "PCB_ID_0");
+	if (ret) {
+		printf("ERROR: get_pcbid PCB_ID_0\n");
+	} else {
+		gpio_direction_input(PCB_ID_0_GPIO);
+		pcbid = gpio_get_value(PCB_ID_0_GPIO);
+		gpio_free(PCB_ID_0_GPIO);
+	}
+
+	ret = gpio_request(PCB_ID_1_GPIO, "PCB_ID_1");
+	if (ret) {
+		printf("ERROR: get_pcbid PCB_ID_1\n");
+	} else {
+		gpio_direction_input(PCB_ID_1_GPIO);
+		pcbid += gpio_get_value(PCB_ID_1_GPIO) << 1;
+		gpio_free(PCB_ID_1_GPIO);
+	}
+
+	switch (pcbid) {
+		case 0:
+			printf("PCBID: 1.00\n");
+			env_set("pcbid", "0");
+			break;
+		case 1:
+			printf("PCBID: 1.01\n");
+			env_set("pcbid", "1");
+			break;
+		case 2:
+			printf("PCBID: 1.02\n");
+			env_set("pcbid", "2");
+			env_set("fdtfile", "imx8mp-blizzard-evt.dts");
+			break;
+		case 3:
+			printf("PCBID: 2.00\n");
+			env_set("pcbid", "3");
+			break;
+		default:
+			printf("PCBID: unknown\n");
+			break;
+	}
 #endif
 
 	return 0;
