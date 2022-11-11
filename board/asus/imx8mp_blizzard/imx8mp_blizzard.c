@@ -514,7 +514,7 @@ int board_late_init(void)
 		case 2:
 			printf("PCBID: 1.02\n");
 			env_set("pcbid", "2");
-			env_set("fdtfile", "imx8mp-blizzard-evt.dts");
+			env_set("fdtfile", "imx8mp-blizzard-evt.dtb");
 			break;
 		case 3:
 			printf("PCBID: 2.00\n");
