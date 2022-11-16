@@ -100,7 +100,7 @@ config TARGET_IMX8MQ_PE100A_2G
 	select ARCH_MISC_INIT
 	select SPL_CRYPTO if SPL
 	
-config TARGET_IMX8MQ_pv100a
+config TARGET_IMX8MQ_PV100A
 	bool "imx8mq_pv100a"
 	select IMX8MQ
 	select IMX8M_LPDDR4
@@ -109,7 +109,7 @@ config TARGET_IMX8MQ_pv100a
 	select ARCH_MISC_INIT
 	select SPL_CRYPTO if SPL
 	
-config TARGET_IMX8MQ_pv100a_2G
+config TARGET_IMX8MQ_PV100A_2G
 	bool "imx8mq_pv100a_2g"
 	select IMX8MQ
 	select IMX8M_LPDDR4
