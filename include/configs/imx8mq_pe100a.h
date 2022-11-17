@@ -13,7 +13,7 @@
 
 #define CONFIG_SYS_BOOTM_LEN		(64 * SZ_1M)
 
-#define CONFIG_SPL_MAX_SIZE		(152 * 1024)
+#define CONFIG_SPL_MAX_SIZE		(154 * 1024)
 #define CONFIG_SYS_MONITOR_LEN		(512 * 1024)
 
 #ifdef CONFIG_SPL_BUILD
@@ -161,8 +161,20 @@
 #define CONFIG_MMCROOT			"/dev/mmcblk1p2"  /* USDHC2 */
 
 #define CONFIG_SYS_SDRAM_BASE           0x40000000
-#define PHYS_SDRAM                      0x40000000
-#define PHYS_SDRAM_SIZE			0xC0000000 /* 3GB DDR */
+
+#if defined(CONFIG_TARGET_IMX8MQ_PE100A_2G)
+/* one bank support */
+#define PHYS_SDRAM			0x40000000
+#define PHYS_SDRAM_SIZE			0x80000000 /* 2GB DDR*/
+
+#elif defined(CONFIG_TARGET_IMX8MQ_PE100A)
+/* two bank support */
+#define PHYS_SDRAM			0x40000000
+#define PHYS_SDRAM_SIZE			0xc0000000 /* 3GB */
+#define PHYS_SDRAM_2			0x100000000
+#define PHYS_SDRAM_2_SIZE		0x40000000 /* 1GB */
+
+#endif
 
 #define CONFIG_MXC_UART_BASE		UART1_BASE_ADDR
 
