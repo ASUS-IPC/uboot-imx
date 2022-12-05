@@ -91,6 +91,7 @@
 	"splashimage=0x50000000\0" \
 	"console=ttymxc0,115200\0" \
 	"conf_addr=0x40000000\0"			\
+	"cmdline_addr=0x41000000\0"			\
 	"fdt_overlay_addr=0x42000000\0"			\
 	"fdt_addr_r=0x43000000\0"			\
 	"fdt_addr=0x43000000\0"			\
@@ -109,7 +110,6 @@
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${fdtfile}\0" \
 	"mmcboot=echo Booting from mmc ...; " \
-		"run mmcargs; " \
 		"if test ${boot_fdt} = yes || test ${boot_fdt} = try; then " \
 			"if run loadfdt; then " \
 				"booti ${loadaddr} - ${fdt_addr_r}; " \
