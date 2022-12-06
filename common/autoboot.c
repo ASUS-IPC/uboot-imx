@@ -583,6 +583,10 @@ static int abortboot(int bootdelay)
 {
 	int abort = 0;
 
+	run_command("mmc partconf 0", 0);
+	printf("Set MMC 0 partconf: 0x0, 0x1, 0x0\n");
+	run_command("mmc partconf 0 0 1 0", 0);
+
 	if (bootdelay >= 0) {
 		if (autoboot_keyed())
 			abort = abortboot_key_sequence(bootdelay);
