@@ -124,6 +124,10 @@
 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
 	"fastboot=echo Enter Fastboot Mode ...; " \
 		"fastboot 0;\0" \
+	"pxeboot=echo Booting from pxe ...; " \
+		"dhcp; " \
+		"pxe get; " \
+		"pxe boot;\0" \
 	"netboot=echo Booting from net ...; " \
 		"run netargs;  " \
 		"if test ${ip_dyn} = yes; then " \
