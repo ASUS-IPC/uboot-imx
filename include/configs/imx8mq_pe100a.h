@@ -89,7 +89,6 @@
 	"bsp_script=boot.scr\0" \
 	"image=Image\0" \
 	"splashimage=0x50000000\0" \
-	"console=ttymxc0,115200\0" \
 	"conf_addr=0x40000000\0"			\
 	"cmdline_addr=0x41000000\0"			\
 	"fdt_overlay_addr=0x42000000\0"			\
