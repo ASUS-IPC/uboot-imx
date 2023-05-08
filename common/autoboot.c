@@ -41,6 +41,7 @@ DECLARE_GLOBAL_DATA_PTR;
 	debug_cond(DEBUG_BOOTKEYS, fmt, ##args)
 
 #define GPIO5_IO04 132
+#define GPIO1_IO08 8
 
 static char bootargs[1024] = {0};
 
@@ -685,6 +686,17 @@ void autoboot_command(const char *s)
 		!defined(CONFIG_TARGET_IMX8MP_BLIZZARD_2G)
 	gpio_request(GPIO5_IO04, "EEPROM_WRITE_CONTROL");
 	gpio_direction_output(GPIO5_IO04, 1);
+	#endif
+
+	#if  defined(CONFIG_TARGET_IMX8MP_BLIZZARD) || \
+		defined(CONFIG_TARGET_IMX8MP_BLIZZARD_4G) || \
+		defined(CONFIG_TARGET_IMX8MP_BLIZZARD_2G)
+	printf("Trigger Platform Reset pin.\n");
+	gpio_request(GPIO1_IO08, "PLATFORM_RESET");
+	gpio_direction_output(GPIO1_IO08, 0);
+	mdelay(20);
+	gpio_direction_output(GPIO1_IO08, 1);
+	gpio_free(GPIO1_IO08);
 	#endif
 
 	set_bootargs();
