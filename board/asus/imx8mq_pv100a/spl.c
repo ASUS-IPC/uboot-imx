@@ -37,7 +37,6 @@ DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_b0;
 extern struct dram_timing_info dram_timing_micron_2gb;
-extern struct dram_timing_info dram_timing_samsung_4gb;
 
 static void spl_dram_init(void)
 {
@@ -47,12 +46,12 @@ static void spl_dram_init(void)
 	if (soc_rev() >= CHIP_REV_2_1) {
 		switch (sku_id) {
 			case SKU_MICRON_4G:
-				printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
-		ddr_init(&dram_timing);
+				printf("spl_dram_init: init Micron 4g ddr.(NXP customized)\n");
+				ddr_init(&dram_timing);
 				break;
 			case SKU_SAMSUNG_4G:
-				printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
-				ddr_init(&dram_timing_samsung_4gb);
+				printf("spl_dram_init: init Samsung 4g ddr.(NXP customized)\n");
+				ddr_init(&dram_timing);
 				break;
 			case SKU_MICRON_2G:
 				printf("spl_dram_init: init Micron 2g ddr.(from Micron 4g ddr)\n");
