@@ -472,6 +472,7 @@ int board_init(void)
 
 #define PCB_ID_0_GPIO IMX_GPIO_NR(4, 2)
 #define PCB_ID_1_GPIO IMX_GPIO_NR(4, 3)
+#define PCB_ID_2_GPIO IMX_GPIO_NR(4, 1)
 
 int board_late_init(void)
 {
@@ -502,6 +503,15 @@ int board_late_init(void)
 		gpio_free(PCB_ID_1_GPIO);
 	}
 
+	ret = gpio_request(PCB_ID_2_GPIO, "PCB_ID_2");
+	if (ret) {
+		printf("ERROR: get_pcbid PCB_ID_2\n");
+	} else {
+		gpio_direction_input(PCB_ID_2_GPIO);
+		pcbid += gpio_get_value(PCB_ID_2_GPIO) << 2;
+		gpio_free(PCB_ID_2_GPIO);
+	}
+
 	switch (pcbid) {
 		case 0:
 			printf("PCBID: 1.00\n");
@@ -520,6 +530,22 @@ int board_late_init(void)
 		case 3:
 			printf("PCBID: 2.00\n");
 			env_set("pcbid", "3");
+			break;
+		case 4:
+			printf("PCBID: 4\n");
+			env_set("pcbid", "4");
+			break;
+		case 5:
+			printf("PCBID: 5\n");
+			env_set("pcbid", "5");
+			break;
+		case 6:
+			printf("PCBID: 6\n");
+			env_set("pcbid", "6");
+			break;
+		case 7:
+			printf("PCBID: 7\n");
+			env_set("pcbid", "7");
 			break;
 		default:
 			printf("PCBID: unknown\n");
