@@ -42,6 +42,7 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define GPIO5_IO04 132
 #define GPIO1_IO08 8
+#define GPIO4_IO25 121
 
 static char bootargs[1024] = {0};
 
@@ -697,6 +698,13 @@ void autoboot_command(const char *s)
 	mdelay(20);
 	gpio_direction_output(GPIO1_IO08, 1);
 	gpio_free(GPIO1_IO08);
+	#endif
+
+	#if defined (CONFIG_TARGET_IMX8MP_BLIZZARD) || \
+		defined (CONFIG_TARGET_IMX8MP_BLIZZARD_2G) || \
+		defined (CONFIG_TARGET_IMX8MP_BLIZZARD_4G)
+	gpio_request(GPIO4_IO25, "SOM_KEEP_ALIVE");
+	gpio_direction_output(GPIO4_IO25, 1);
 	#endif
 
 	set_bootargs();
