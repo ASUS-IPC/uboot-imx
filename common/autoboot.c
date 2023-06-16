@@ -163,21 +163,39 @@ static void parse_cmdline(void)
 	fs_argv[0] = "ext2load";
 	fs_argv[1] = "mmc";
 
+
+
 	if (!strcmp(mmcdev, "0"))
-		fs_argv[2] = "0:3";
+		fs_argv[2] = "0:4";
 	else if (!strcmp(mmcdev, "1"))
-		fs_argv[2] = "1:3";
+		fs_argv[2] = "1:4";
 	else {
 		printf("Invalid mmcdev\n");
 		goto end;
 	}
 
 	fs_argv[3] = file_addr;
-	fs_argv[4] = "boot/cmdline.txt";
+	fs_argv[4] = "overlay-boot/upper/cmdline.txt";
 
 	if (do_ext2load(NULL, 0, 5, fs_argv)) {
-		printf("[cmdline] do_ext2load fail\n");
-		goto end;
+		printf("[cmdline]overlay: do_ext2load fail\n");
+
+		if (!strcmp(mmcdev, "0"))
+			fs_argv[2] = "0:3";
+		else if (!strcmp(mmcdev, "1"))
+			fs_argv[2] = "1:3";
+		else {
+			printf("Invalid mmcdev\n");
+			goto end;
+		}
+
+		fs_argv[3] = file_addr;
+		fs_argv[4] = "boot/cmdline.txt";
+
+		if (do_ext2load(NULL, 0, 5, fs_argv)) {
+			printf("[cmdline] do_ext2load fail\n");
+			goto end;
+		}
 	}
 
 	file_size = env_get("filesize");
