@@ -671,3 +671,29 @@
 		>;
 	};
 };
+
+&thermal_zones {
+	cpu-thermal {
+		trips {
+			cpu_alert0: trip0 {
+				temperature = <95000>;
+			};
+
+			cpu_crit0: trip1 {
+				temperature = <105000>;
+			};
+		};
+	};
+
+        soc-thermal {
+                trips {
+                        soc_alert0: trip0 {
+                                temperature = <95000>;
+                        };
+
+                        soc_crit0: trip1 {
+                                temperature = <105000>;
+                        };
+		};
+	};
+};
