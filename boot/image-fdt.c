@@ -305,20 +305,35 @@ static void parse_hw_config(struct hw_config *hw_conf)
 	fs_argv[1] = "mmc";
 
 	if (!strcmp(mmcdev, "0"))
-		fs_argv[2] = "0:3";
+		fs_argv[2] = "0:4";
 	else if (!strcmp(mmcdev, "1"))
-		fs_argv[2] = "1:3";
+		fs_argv[2] = "1:4";
 	else {
 		printf("Invalid mmcdev\n");
 		goto end;
 	}
 
 	fs_argv[3] = file_addr;
-	fs_argv[4] = "boot/config.txt";
+	fs_argv[4] = "overlay-boot/config.txt";
 
 	if (do_ext2load(NULL, 0, 5, fs_argv)) {
-		printf("[conf] do_ext2load fail\n");
-		goto end;
+		printf("[conf] overlay: do_ext2load fail\n");
+		if (!strcmp(mmcdev, "0"))
+			fs_argv[2] = "0:3";
+		else if (!strcmp(mmcdev, "1"))
+			fs_argv[2] = "1:3";
+		else {
+			printf("Invalid mmcdev\n");
+			goto end;
+		}
+
+		fs_argv[3] = file_addr;
+		fs_argv[4] = "boot/config.txt";
+
+		if (do_ext2load(NULL, 0, 5, fs_argv)) {
+			printf("[conf] do_ext2load fail\n");
+			goto end;
+		}
 	}
 
 	file_size = env_get("filesize");
@@ -465,6 +480,7 @@ static int merge_dts_overlay(struct cmd_tbl *cmdtp, struct fdt_header *working_f
 	char *file_addr, *mmcdev;
 	struct fdt_header *blob;
 	int ret;
+	char fs_overlay_file[MAX_OVERLAY_NAME_LENGTH] = "overlay-boot/overlays/";
 	char overlay_file[MAX_OVERLAY_NAME_LENGTH] = "boot/overlays/";
 
 	static char *fs_argv[5];
@@ -486,6 +502,8 @@ static int merge_dts_overlay(struct cmd_tbl *cmdtp, struct fdt_header *working_f
 		goto fail;
 	}
 
+	strcat(fs_overlay_file, overlay_name);
+	strncat(fs_overlay_file, ".dtbo", 6);
 	strcat(overlay_file, overlay_name);
 	strncat(overlay_file, ".dtbo", 6);
 
@@ -493,20 +511,35 @@ static int merge_dts_overlay(struct cmd_tbl *cmdtp, struct fdt_header *working_f
 	fs_argv[1] = "mmc";
 
 	if (!strcmp(mmcdev, "0"))
-		fs_argv[2] = "0:3";
+		fs_argv[2] = "0:4";
 	else if (!strcmp(mmcdev, "1"))
-		fs_argv[2] = "1:3";
+		fs_argv[2] = "1:4";
 	else {
 		printf("Invalid mmcdev\n");
 		goto fail;
 	}
 
 	fs_argv[3] = file_addr;
-	fs_argv[4] = overlay_file;
+	fs_argv[4] = fs_overlay_file;
 
 	if (do_ext2load(NULL, 0, 5, fs_argv)) {
-		printf("[merge_dts_overlay] do_ext2load fail\n");
-		goto fail;
+		printf("[merge_dts_overlay] overlay: do_ext2load fail\n");
+		if (!strcmp(mmcdev, "0"))
+			fs_argv[2] = "0:3";
+		else if (!strcmp(mmcdev, "1"))
+			fs_argv[2] = "1:3";
+		else {
+			printf("Invalid mmcdev\n");
+			goto fail;
+		}
+
+		fs_argv[3] = file_addr;
+		fs_argv[4] = overlay_file;
+
+		if (do_ext2load(NULL, 0, 5, fs_argv)) {
+			printf("[merge_dts_overlay] do_ext2load fail\n");
+			goto fail;
+		}
 	}
 
 	blob = map_sysmem(addr, 0);
