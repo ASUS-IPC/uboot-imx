@@ -75,17 +75,19 @@
 		status = "okay";
 	};
 
+/*
 	rm67199_panel {
 		compatible = "raydium,rm67199";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_mipi_dsi_en>;
 		reset-gpio = <&gpio1 8 GPIO_ACTIVE_LOW>;
 		dsi-lanes = <4>;
-		video-mode = <2>;	/* 0: burst mode
+		video-mode = <2>;	*/
+					/* 0: burst mode
 					 * 1: non-burst mode with sync event
 					 * 2: non-burst mode with sync pulse
 					 */
-		panel-width-mm = <68>;
+/*		panel-width-mm = <68>;
 		panel-height-mm = <121>;
 		status = "okay";
 
@@ -95,6 +97,7 @@
 			};
 		};
 	};
+*/
 };
 
 &flexcan1 {
@@ -300,11 +303,13 @@
 		adi,dsi-lanes = <4>;
 		status = "okay";
 
+/*
 		port {
 			adv7535_from_dsim: endpoint {
 				remote-endpoint = <&dsim_to_adv7535>;
 			};
 		};
+*/
 	};
 };
 
@@ -329,6 +334,7 @@
 	status = "okay";
 };
 
+/*
 &mipi_dsi {
 	status = "okay";
 
@@ -344,6 +350,7 @@
 		};
 	};
 };
+*/
 
 &snvs_pwrkey {
 	status = "okay";
@@ -441,7 +448,7 @@
 			MX8MP_IOMUXC_ENET_TD3__ENET_QOS_RGMII_TD3		0x1f
 			MX8MP_IOMUXC_ENET_TX_CTL__ENET_QOS_RGMII_TX_CTL	0x1f
 			MX8MP_IOMUXC_ENET_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK	0x1f
-			MX8MP_IOMUXC_SAI2_RXC__GPIO4_IO22		0x19
+			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20		0x19
 		>;
 	};
 
@@ -461,7 +468,7 @@
 			MX8MP_IOMUXC_SAI1_TXD3__ENET1_RGMII_TD3		0x1f
 			MX8MP_IOMUXC_SAI1_TXD4__ENET1_RGMII_TX_CTL	0x1f
 			MX8MP_IOMUXC_SAI1_TXD5__ENET1_RGMII_TXC		0x1f
-			MX8MP_IOMUXC_SAI1_RXD0__GPIO4_IO02		0x19
+			MX8MP_IOMUXC_GPIO1_IO08__GPIO1_IO08		0x19
 		>;
 	};
 
@@ -550,11 +557,13 @@
 		>;
 	};
 
+/*
 	pinctrl_mipi_dsi_en: mipi_dsi_en {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO08__GPIO1_IO08	0x16
 		>;
 	};
+*/
 
 	pinctrl_pmic: pmicirq {
 		fsl,pins = <

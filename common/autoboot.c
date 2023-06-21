@@ -41,8 +41,8 @@ DECLARE_GLOBAL_DATA_PTR;
 	debug_cond(DEBUG_BOOTKEYS, fmt, ##args)
 
 #define GPIO5_IO04 132
-#define GPIO1_IO08 8
 #define GPIO4_IO25 121
+#define GPIO4_IO20 116
 
 static char bootargs[1024] = {0};
 
@@ -692,12 +692,14 @@ void autoboot_command(const char *s)
 	#if  defined(CONFIG_TARGET_IMX8MP_BLIZZARD) || \
 		defined(CONFIG_TARGET_IMX8MP_BLIZZARD_4G) || \
 		defined(CONFIG_TARGET_IMX8MP_BLIZZARD_2G)
-	printf("Trigger Platform Reset pin.\n");
-	gpio_request(GPIO1_IO08, "PLATFORM_RESET");
-	gpio_direction_output(GPIO1_IO08, 0);
-	mdelay(20);
-	gpio_direction_output(GPIO1_IO08, 1);
-	gpio_free(GPIO1_IO08);
+	printf("Trigger RTL9010ARG PHY Reset pin.\n");
+	gpio_request(GPIO4_IO20, "RTL9010_RESET");
+	gpio_direction_output(GPIO4_IO20, 1);
+	mdelay(600);
+	gpio_direction_output(GPIO4_IO20, 0);
+	mdelay(10);
+	gpio_direction_output(GPIO4_IO20, 1);
+	gpio_free(GPIO4_IO20);
 	#endif
 
 	#if defined (CONFIG_TARGET_IMX8MP_BLIZZARD) || \
