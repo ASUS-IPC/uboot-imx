@@ -25,7 +25,6 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 extern struct dram_timing_info dram_timing_b0;
-extern struct dram_timing_info dram_timing_samsung_4gb;
 
 #define SKU_ID0_GPIO    IMX_GPIO_NR(4, 29)
 #define SKU_ID1_GPIO    IMX_GPIO_NR(4, 30)
@@ -49,10 +48,10 @@ void spl_dram_init(void)
 	/* ddr init */
 	if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1) {
 		if (sku_id == 3 || sku_id == 4) {
-			printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
-			ddr_init(&dram_timing_samsung_4gb);
+			printf("spl_dram_init: init Samsung 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33-option2)\n");
+		        ddr_init(&dram_timing);
 		} else {
-			printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
+		        printf("spl_dram_init: init Micron 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33-option2)\n");
 			ddr_init(&dram_timing);
 		}
 	} else {
