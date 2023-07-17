@@ -35,6 +35,14 @@
 		      <0x1 0x00000000 0 0xc0000000>;
 	};
 
+	reg_pcbid2: regulator-pcbid2 {
+		compatible = "regulator-fixed";
+		regulator-name = "pcbid2";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pcbid2>;
+		gpio = <&gpio4 1 GPIO_ACTIVE_LOW>;
+	};
+
 	reg_can1_stby: regulator-can1-stby {
 		compatible = "regulator-fixed";
 		regulator-name = "can1-stby";
@@ -431,6 +439,12 @@
 
 &iomuxc {
 	pinctrl-names = "default";
+
+	pinctrl_pcbid2: pcbid2 {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_RXC__GPIO4_IO01	0x19
+		>;
+	};
 
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <
