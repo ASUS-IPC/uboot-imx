@@ -48,10 +48,10 @@ void spl_dram_init(void)
 	/* ddr init */
 	if ((get_cpu_rev() & 0xfff) == CHIP_REV_2_1) {
 		if (sku_id == 3 || sku_id == 4) {
-			printf("spl_dram_init: init Samsung 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33-option2)\n");
+			printf("spl_dram_init: init Samsung 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33-option1)\n");
 		        ddr_init(&dram_timing);
 		} else {
-		        printf("spl_dram_init: init Micron 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33-option2)\n");
+		        printf("spl_dram_init: init Micron 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33-option1)\n")
 			ddr_init(&dram_timing);
 		}
 	} else {
