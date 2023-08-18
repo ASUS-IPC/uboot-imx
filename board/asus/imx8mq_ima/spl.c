@@ -48,12 +48,12 @@ static void spl_dram_init(void)
 		switch (sku_id) {
 			case SKU_MB_MICRON_4G:
 			case SKU_SYS_MICRON_4G:
-				printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
+				printf("spl_dram_init: init Micron 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33-option1)\n");
 		ddr_init(&dram_timing);
 				break;
 			case SKU_SAMSUNG_4G:
-				printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
-				ddr_init(&dram_timing_samsung_4gb);
+				printf("spl_dram_init: init Samsung 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33-option1)\n");
+				ddr_init(&dram_timing);
 				break;
 			case SKU_MICRON_2G:
 				printf("spl_dram_init: init Micron 2g ddr.(from Micron 2g ddr)\n");
