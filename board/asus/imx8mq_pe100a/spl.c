@@ -191,6 +191,7 @@ int power_init_board(void)
 {
 	struct pmic *p;
 	int ret;
+       unsigned int reg;
 
 printf("start BD71837 power init +++++++++\n");
 	ret = power_bd71837_init(I2C_PMIC);
@@ -232,9 +233,58 @@ printf("start BD71837 power init +++++++++\n");
 	/* 0.7-1.3 (10mVstep) */
 	pmic_reg_write(p, BD718XX_BUCK1_VOLT_RUN, 0x19);
 
+	pmic_reg_read(p, BD718XX_BUCK1_CTRL, &reg);
+	printf("BD718XX_BUCK1_CTRL=%x\n", reg );
+	pmic_reg_write(p, BD718XX_BUCK1_CTRL, reg |BIT(3));
+
+	pmic_reg_read(p, BD718XX_BUCK2_CTRL, &reg);
+	printf("BD718XX_BUCK2_CTRL=%x\n", reg);
+	pmic_reg_write(p, BD718XX_BUCK2_CTRL, reg |BIT(3));
+
+	pmic_reg_read(p, BD71837_BUCK3_CTRL, &reg);
+	printf("BD71837_BUCK3_CTRL=%x\n", reg);
+	pmic_reg_write(p, BD71837_BUCK3_CTRL, reg |BIT(3));
+
+	pmic_reg_read(p, BD71837_BUCK4_CTRL, &reg);
+	printf("BD71837_BUCK4_CTRL=%x\n", reg);
+	pmic_reg_write(p, BD71837_BUCK4_CTRL, reg |BIT(3));
+
+	pmic_reg_read(p, BD718XX_1ST_NODVS_BUCK_CTRL, &reg);
+	printf("BD718XX_1ST_NODVS_BUCK_CTRL=%x\n", reg);
+	pmic_reg_write(p, BD718XX_1ST_NODVS_BUCK_CTRL, reg |BIT(3));
+
+	pmic_reg_read(p, BD718XX_2ND_NODVS_BUCK_CTRL, &reg);
+	printf("BD718XX_2ND_NODVS_BUCK_CTRL=%x\n", reg);
+	pmic_reg_write(p, BD718XX_2ND_NODVS_BUCK_CTRL, reg |BIT(3));
+
+	pmic_reg_read(p, BD718XX_3RD_NODVS_BUCK_CTRL, &reg);
+	printf("BD718XX_3RD_NODVS_BUCK_CTRL=%x\n", reg);
+	pmic_reg_write(p, BD718XX_3RD_NODVS_BUCK_CTRL, reg |BIT(3));
+
+	pmic_reg_read(p, BD718XX_4TH_NODVS_BUCK_CTRL, &reg);
+	printf("BD718XX_4TH_NODVS_BUCK_CTRL=%x\n", reg);
+	pmic_reg_write(p, BD718XX_4TH_NODVS_BUCK_CTRL, reg |BIT(3));
+
 	/* lock the PMIC regs */
 	pmic_reg_write(p, BD718XX_REGLOCK, 0x11);
 	printf("end BD71837 power init ---------\n");
+
+        pmic_reg_read(p, BD718XX_BUCK1_CTRL, &reg);
+	printf("BD718XX_BUCK1_CTRL=%x\n", reg );
+	pmic_reg_read(p, BD718XX_BUCK2_CTRL, &reg);
+	printf("BD718XX_BUCK2_CTRL=%x\n", reg);
+	pmic_reg_read(p, BD71837_BUCK3_CTRL, &reg);
+	printf("BD71837_BUCK3_CTRL=%x\n", reg);
+	pmic_reg_read(p, BD71837_BUCK4_CTRL, &reg);
+	printf("BD71837_BUCK4_CTRL=%x\n", reg);
+	pmic_reg_read(p, BD718XX_1ST_NODVS_BUCK_CTRL, &reg);
+	printf("BD718XX_1ST_NODVS_BUCK_CTRL=%x\n", reg);
+	pmic_reg_read(p, BD718XX_2ND_NODVS_BUCK_CTRL, &reg);
+	printf("BD718XX_2ND_NODVS_BUCK_CTRL=%x\n", reg);
+	pmic_reg_read(p, BD718XX_3RD_NODVS_BUCK_CTRL, &reg);
+	printf("BD718XX_3RD_NODVS_BUCK_CTRL=%x\n", reg);
+	pmic_reg_read(p, BD718XX_4TH_NODVS_BUCK_CTRL, &reg);
+	printf("BD718XX_4TH_NODVS_BUCK_CTRL=%x\n", reg);
 	return 0;
 }
 #endif
