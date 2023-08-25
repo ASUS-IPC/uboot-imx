@@ -156,6 +156,8 @@
 	"netargs=setenv bootargs ${jh_clk} ${mcore_clk} console=${console} " \
 		"root=/dev/nfs " \
 		"ip=dhcp nfsroot=${serverip}:${nfsroot},v3,tcp\0" \
+	"fastboot=echo Enter Fastboot Mode ...; " \
+		"fastboot 0;\0" \
 	"netboot=echo Booting from net ...; " \
 		"run netargs;  " \
 		"if test ${ip_dyn} = yes; then " \
@@ -180,7 +182,7 @@
 		   "else " \
 			   "if run loadimage; then " \
 				   "run mmcboot; " \
-			   "else run netboot; " \
+			   "else run fastboot; " \
 			   "fi; " \
 		   "fi; " \
 	   "fi;"
