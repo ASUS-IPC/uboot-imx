@@ -492,6 +492,12 @@ int board_init(void)
 #define PCB_ID_1_GPIO IMX_GPIO_NR(4, 3)
 #define PCB_ID_2_GPIO IMX_GPIO_NR(4, 1)
 
+// CAN Settings
+#define CAN1_STBY_GPIO IMX_GPIO_NR(4, 24)
+#define CAN2_STBY_GPIO IMX_GPIO_NR(4, 0)
+#define CAN3_STBY_GPIO IMX_GPIO_NR(4, 26)
+#define CAN4_STBY_GPIO IMX_GPIO_NR(4, 21)
+
 int board_late_init(void)
 {
 #ifdef CONFIG_ENV_IS_IN_MMC
@@ -502,6 +508,15 @@ int board_late_init(void)
 	env_set("board_rev", "iMX8MP");
 
 	int ret, pcbid = -1;
+
+	gpio_request(CAN1_STBY_GPIO, "CAN1_STBY");
+	gpio_request(CAN2_STBY_GPIO, "CAN2_STBY");
+	gpio_request(CAN3_STBY_GPIO, "CAN3_STBY");
+	gpio_request(CAN4_STBY_GPIO, "CAN4_STBY");
+	gpio_direction_output(CAN1_STBY_GPIO, 1);
+	gpio_direction_output(CAN2_STBY_GPIO, 1);
+	gpio_direction_output(CAN3_STBY_GPIO, 1);
+	gpio_direction_output(CAN4_STBY_GPIO, 1);
 
 	ret = gpio_request(PCB_ID_0_GPIO, "PCB_ID_0");
 	if (ret) {
