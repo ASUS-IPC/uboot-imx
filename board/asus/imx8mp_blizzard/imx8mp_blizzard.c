@@ -561,11 +561,11 @@ int board_late_init(void)
 			env_set("pcbid", "2");
 			break;
 		case 3:
-			printf("PCBID: 2.00\n");
+			printf("PCBID: 1.03\n");
 			env_set("pcbid", "3");
 			break;
 		case 4:
-			printf("PCBID: 4\n");
+			printf("PCBID: 1.04\n");
 			env_set("pcbid", "4");
 			break;
 		case 5:
