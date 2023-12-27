@@ -288,6 +288,7 @@ int board_late_init(void)
 #ifdef CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
 	env_set("board_name", "EVK");
 	env_set("board_rev", "iMX8MQ");
+	env_set("u-boot_version", PLAIN_VERSION);
 #endif
 
 #ifdef CONFIG_ENV_IS_IN_MMC

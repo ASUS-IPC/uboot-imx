@@ -10,7 +10,7 @@
 #include <linux/stringify.h>
 #include <asm/arch/imx-regs.h>
 #include "imx_env.h"
-
+#include <version.h>
 #define CONFIG_SYS_BOOTM_LEN		(64 * SZ_1M)
 
 #define CONFIG_SPL_MAX_SIZE		(154 * 1024)
@@ -88,6 +88,8 @@
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
 	"bsp_script=boot.scr\0" \
 	"image=Image\0" \
+	"initrdfile=swupdate-image.img\0" \
+	"datapart=4\0" \
 	"splashimage=0x50000000\0" \
 	"conf_addr=0x40000000\0"			\
 	"cmdline_addr=0x41000000\0"			\
@@ -97,13 +99,15 @@
 	"fdt_high=0xffffffffffffffff\0"		\
 	"boot_fdt=try\0" \
 	"fdtfile=imx8mq-pe100a.dtb\0" \
+	"ramdiskfdt=swupdate-image.dtb\0" \
 	"bootm_size=0x10000000\0" \
 	"mmcdev="__stringify(CONFIG_SYS_MMC_ENV_DEV)"\0" \
 	"mmcpart=1\0" \
 	"mmcroot=" CONFIG_MMCROOT " rootwait rw\0" \
 	"mmcautodetect=yes\0" \
 	"cursor=0\0" \
-	"mmcargs=setenv bootargs ${jh_clk} ${mcore_clk} console=${console} root=${mmcroot} vt.global_cursor_default=${cursor}\0 " \
+	"mmcargs=setenv bootargs ${jh_clk} ${mcore_clk} console=${console} root=${mmcroot} vt.global_cursor_default=${cursor} " \
+		"cur_slot=${bootslot} U-Boot_ver=${u-boot_version}\0"\
 	"loadbootscript=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${bsp_script};\0" \
 	"bootscript=echo Running bootscript from mmc ...; " \
 		"source\0" \
@@ -145,7 +149,31 @@
 		"else " \
 			"booti; " \
 		"fi;\0" \
+	"bootslot=dualA\0" \
+	"u-boot_version=null\0" \
+	"usb_port=1\0" \
+	"post_opt=saveenv;\0" \
+	"adjustbootsource=if test ${bootslot} = dualA || test ${bootslot} = singlenormal; then run adjustbootsourceA; fi;" \
+		"if test ${bootslot} = dualB; then run adjustbootsourceB; fi\0" \
+	"altbootusb=echo Boot Fail! Get into usb fastboot download.;fastboot usb ${usb_port}\0" \
+	"altbootsingle=if test ${bootslot} = singlerescue; then run altbootusb; fi; if test ${bootslot} = singlenormal; then run swuboot; fi\0" \
+	"adjustbootsourceB=echo RootFs Slot B; setenv mmcpart 3; setenv mmcroot /dev/mmcblk${mmcdev}p4 rootwait rw\0" \
+	"adjustbootsourceA=echo RootFs Slot A; setenv mmcpart 1; setenv mmcroot /dev/mmcblk${mmcdev}p2 rootwait rw\0" \
+	"altbootRollbackB=echo Rolling back to slot dualB;setenv bootslot dualB;run post_opt;run bootcmd\0" \
+	"altbootRollbackA=echo Rolling back to slot dualA;setenv bootslot dualA;run post_opt;run bootcmd\0" \
+	"altbootdual=if test ${bootslot} = dualA ; then run altbootRollbackB; fi; if test ${bootslot} = dualB ; then run altbootRollbackA; fi;\0" \
+	"swuargs=setenv bootargs console=ttymxc0,115200 earlycon=${earlycon},${baudrate} " \
+		"cur_slot=${bootslot} U-Boot_ver=${u-boot_version}\0"\
+	"loadswuimage=load mmc ${mmcdev}:${datapart} ${loadaddr} recovery/${image}\0" \
+	"loadswufdt=load mmc ${mmcdev}:${datapart} ${fdt_addr} recovery/${ramdiskfdt}\0" \
+	"loadswuramdisk=load mmc ${mmcdev}:${datapart} ${initrd_addr} recovery/${initrdfile}\0" \
+	"swuboot=echo swuboot ramdisk;run loadswuimage;run loadswufdt;run loadswuramdisk;run swuargs;booti ${loadaddr} ${initrd_addr} ${fdt_addr}\0" \
+	"altbootcmd=if test ${bootslot} = singlerescue ||  test ${bootslot} = singlenormal; then run altbootsingle; fi;" \
+		"if test ${bootslot} = dualA ||  test ${bootslot} = dualB; then run altbootdual; fi\0" \
 	"bsp_bootcmd=echo Running BSP bootcmd ...; " \
+			"if test ${bootslot} = singlerescue;then run swuboot; fi;" \
+			"saveenv;" \
+			"run adjustbootsource;" \
 			"mmc dev ${mmcdev}; if mmc rescan; then " \
 			   "if run loadbootscript; then " \
 				   "run bootscript; " \
