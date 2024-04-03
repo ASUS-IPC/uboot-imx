@@ -1,0 +1,6 @@
+The Debian Package bootloader
+----------------------------
+
+This package is used to install bootloader whinch include uboot, atf.
+
+ -- Singhome_Lee <singhome1_lee@asus.com>  Tue, 2 Apr 2024 16:12:23 +0000

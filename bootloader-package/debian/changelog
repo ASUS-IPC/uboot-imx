@@ -1,0 +1,5 @@
+bootloader (1.0.31) focal; urgency=low
+
+  * PE100A Bootloader Initial Release.
+
+ -- TBD <TBD@asus.com>  Tue, 16 Apr 2024 15:50:23 +0000

@@ -24,6 +24,10 @@
 # host programs on Cygwin
 *.exe
 
+#bootloader package files
+/bootloader_*
+/bootloader-package/debian/files
+
 # Build tree
 /build-*
 

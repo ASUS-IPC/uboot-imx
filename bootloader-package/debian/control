@@ -1,0 +1,11 @@
+Source: bootloader
+Section: misc
+Priority: extra
+Maintainer: Singhome_Lee <singhome1_lee@asus.com>
+Build-Depends: debhelper (>= 9.0.0), perl
+Standards-Version: 3.9.2
+
+Package: bootloader-pe100a
+Architecture: any
+Depends: ${misc:Depends}
+Description: This package is used to install bootloader whinch include uboot, atf.

@@ -1,0 +1,13 @@
+Format: http://dep.debian.net/deps/dep5
+Upstream-Name: bootloader
+
+Files: *
+Copyright: 2024 Singhome_Lee <singhome1_lee@asus.com>
+License: LGPL-2.0+
+
+Files: debian/*
+Copyright: 2024 Singhome_Lee <singhome1_lee@asus.com>
+License: LGPL-2.0+
+
+License: LGPL-2.0+
+ This This package is used to install bootloader which include uboot, atf.

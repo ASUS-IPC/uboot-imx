@@ -1,0 +1,20 @@
+#!/bin/sh
+bootloader_img=/tmp/bootloader.bin
+
+[ -f $bootloader_img ] || { echo "bootloader image unfound, bootloader installation fail"; exit 0; }
+
+MMC=$(mount | grep " \/ " | cut -c  6-12)
+if [ "$MMC" != "mmcblk0" ]; then
+	echo "Flash bootloader to mmcblk1"
+	sudo dd if=$bootloader_img of=/dev/mmcblk1 bs=1024 seek=33
+else
+	echo "Flash bootloader to mmcblk0"
+	sudo dd if=$bootloader_img of=/dev/mmcblk0 bs=1024 seek=33
+
+        echo "Flash bootloader to mmcblk0boot0"
+        echo 0 > /sys/block/mmcblk0boot0/force_ro
+        sudo dd if=$bootloader_img of=/dev/mmcblk0boot0 bs=1024 seek=33
+        echo 1 > /sys/block/mmcblk0boot0/force_ro
+fi
+
+sync
