@@ -1152,6 +1152,9 @@ dtb-$(CONFIG_ARCH_IMX8M) += \
 	imx8mn-venice.dtb \
 	imx8mn-venice-gw7902.dtb \
 	imx8mq-evk.dtb \
+	imx8mq-ima.dtb \
+	imx8mq-pe100a.dtb \
+	imx8mq-pv100a.dtb \
 	imx8mm-beacon-kit.dtb \
 	imx8mn-beacon-kit.dtb \
 	imx8mq-mnt-reform2.dtb \

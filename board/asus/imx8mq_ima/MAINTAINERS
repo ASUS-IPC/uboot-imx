@@ -1,0 +1,6 @@
+i.ASUS IMA BOARD
+M:	Singhome1_lee <singhome1_lee@asus.com>
+S:	Maintained
+F:	board/asus/imx8mq_ima/
+F:	include/configs/imx8mq_ima.h
+F:	configs/imx8mq_ima_defconfig

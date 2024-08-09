@@ -1,0 +1,6 @@
+i.ASUS PV100A BOARD
+M:	Singhome1_lee <singhome1_lee@asus.com>
+S:	Maintained
+F:	board/asus/imx8mq_pv100a/
+F:	include/configs/imx8mq_pv100a.h
+F:	configs/imx8mq_pv100a_defconfig
