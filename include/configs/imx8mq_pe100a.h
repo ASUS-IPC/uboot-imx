@@ -146,10 +146,18 @@
 
 
 #define CFG_SYS_SDRAM_BASE           0x40000000
+
+#if defined(CONFIG_TARGET_IMX8MQ_PE100A_2G)
+/* one bank support */
+#define PHYS_SDRAM			0x40000000
+#define PHYS_SDRAM_SIZE			0x80000000 /* 2GB DDR*/
+#elif defined(CONFIG_TARGET_IMX8MQ_PE100A)
+/* two bank support */
 #define PHYS_SDRAM                      0x40000000
 #define PHYS_SDRAM_SIZE			0xC0000000 /* 3GB DDR */
 #define PHYS_SDRAM_2			0x100000000
 #define PHYS_SDRAM_2_SIZE		0x40000000 /* 1GB */
+#endif
 
 #define CFG_MXC_UART_BASE		UART_BASE_ADDR(1)
 

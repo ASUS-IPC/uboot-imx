@@ -7,10 +7,10 @@
 obj-y += imx8mq_ima.o
 
 ifdef CONFIG_SPL_BUILD
-obj-y += spl.o
+obj-y += spl.o  sku_id.o
 ifdef CONFIG_IMX8MQ_4GB_DDR_TIMING
 obj-$(CONFIG_IMX8M_LPDDR4) += lpddr4_timing_4g.o
 else
-obj-$(CONFIG_IMX8M_LPDDR4) += lpddr4_timing_b0.o lpddr4_timing.o
+obj-$(CONFIG_IMX8M_LPDDR4) += lpddr4_timing_b0.o lpddr4_timing.o  lpddr4_timing_micron_2gb.o lpddr4_timing_samsung_4gb.o
 endif
 endif
