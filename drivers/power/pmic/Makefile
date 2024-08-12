@@ -12,7 +12,6 @@ obj-$(CONFIG_DM_PMIC_MAX8998) += max8998.o
 obj-$(CONFIG_DM_PMIC_MC34708) += mc34708.o
 obj-$(CONFIG_$(SPL_)DM_PMIC_BD71837) += bd71837.o
 obj-$(CONFIG_$(SPL_)DM_PMIC_MP5416) += mp5416.o
-obj-$(CONFIG_$(SPL_)DM_PMIC_PFUZE100) += pfuze100.o
 obj-$(CONFIG_$(SPL_)DM_PMIC_PCA9450) += pca9450.o
 obj-$(CONFIG_$(SPL_)DM_PMIC_PF9453) += pf9453.o
 obj-$(CONFIG_$(SPL_)DM_PMIC_PF0900) += pf0900.o
@@ -45,7 +44,6 @@ ifeq ($(CONFIG_$(SPL_)POWER_LEGACY),y)
 obj-$(CONFIG_POWER_LTC3676) += pmic_ltc3676.o
 obj-$(CONFIG_POWER_BD71837) += pmic_bd71837.o
 obj-$(CONFIG_POWER_PCA9450) += pmic_pca9450.o
-obj-$(CONFIG_POWER_PFUZE100) += pmic_pfuze100.o
 obj-$(CONFIG_POWER_PFUZE3000) += pmic_pfuze3000.o
 obj-$(CONFIG_POWER_HI6553) += pmic_hi6553.o
 obj-$(CONFIG_POWER_MC34VR500) += pmic_mc34vr500.o
