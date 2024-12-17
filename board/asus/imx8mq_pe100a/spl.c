@@ -59,6 +59,10 @@ static void spl_dram_init(void)
 				printf("spl_dram_init: init Micron 2g ddr.(from Micron 2g ddr)\n");
 				ddr_init(&dram_timing_micron_2gb);
 				break;
+			case SKU_MICRON_MT53E1G32D2FW_4G:
+				printf("spl_dram_init: init Micron MT53E1G32D2FW-046 WT 4G ddr.(4g timing-DDRtool_V3.31-RPA_V33)\n");
+				ddr_init(&dram_timing);
+				break;
 			default:
 				//run 2gb setting default
 				printf("spl_dram_init: not support sku_id(%d), init Micron 2g ddr."
