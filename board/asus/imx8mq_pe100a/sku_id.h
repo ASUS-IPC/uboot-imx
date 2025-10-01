@@ -7,6 +7,8 @@
 #define SKU_SYS_MICRON_4G	1
 #define SKU_SAMSUNG_4G		3
 #define SKU_MICRON_2G		5
+#define SKU_MICRON_MT53E1G32D2FW_4G	4
+#define SKU_NANYA_NT6AN1024F32AV_J2_4G 6
 
 int get_sku_id(void);
 

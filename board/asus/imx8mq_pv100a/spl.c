@@ -39,7 +39,6 @@ DECLARE_GLOBAL_DATA_PTR;
 extern struct dram_timing_info dram_timing_b0;
 extern struct dram_timing_info dram_timing_4g;
 extern struct dram_timing_info dram_timing_micron_2gb;
-extern struct dram_timing_info dram_timing_samsung_4gb;
 
 static void spl_dram_init(void)
 {
@@ -58,23 +57,23 @@ static void spl_dram_init(void)
 	/* ddr init */
 	if (soc_rev() >= CHIP_REV_2_1) {
 		switch (sku_id) {
-			case SKU_MB_MICRON_4G:
-			case SKU_SYS_MICRON_4G:
-				printf("spl_dram_init: init Micron 4g ddr.(RPA_v24)\n");
+			case SKU_MICRON_4G:
+				printf("spl_dram_init: init Micron 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33)\n");
 		ddr_init(&dram_timing);
 				break;
 			case SKU_SAMSUNG_4G:
-				printf("spl_dram_init: init Samsung 4g ddr.(RPA_v25)\n");
-				ddr_init(&dram_timing_samsung_4gb);
+				printf("spl_dram_init: init Micron 4g ddr.(4g timing-DDRtool_V3.31-RPA_V33)\n");
+				ddr_init(&dram_timing);
 				break;
 			case SKU_MICRON_2G:
 				printf("spl_dram_init: init Micron 2g ddr.(from Micron 2g ddr)\n");
 				ddr_init(&dram_timing_micron_2gb);
 				break;
+			case SKU_SAMSUNG_2G://not support yet
+				printf("spl_dram_init: not support samsung 2g yet\n");
 			default:
 				//run 2gb setting default
-				printf("spl_dram_init: not support sku_id(%d), init Micron 2g ddr."
-						"(from Micron 4g ddr)\n", sku_id);
+				printf("spl_dram_init: not support sku_id(%d), init Micron 2g ddr.", sku_id);
 				ddr_init(&dram_timing_micron_2gb);
 				break;
 		}
