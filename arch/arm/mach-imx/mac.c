@@ -57,4 +57,19 @@ void imx_get_mac_from_fuse(int dev_id, unsigned char *mac)
 		mac[4] = value >> 8;
 		mac[5] = value;
 	}
+
+	if (mac[0] == 0xff && mac[1] == 0xff && mac[2] == 0xff && mac[3] == 0xff && mac[4] == 0xff && mac[5] == 0xff) {
+		u32 value = readl(&fuse->mac_addr1);
+
+		mac[0] = value >> 24;
+		mac[1] = value >> 16;
+
+		value = readl(&fuse->mac_addr2);
+		mac[2] = value >> 24;
+		mac[3] = value >> 16;
+		mac[4] = value >> 8;
+		mac[5] = value;
+
+		printf("Warning: using recovery banks for MAC address\n");
+	}
 }
