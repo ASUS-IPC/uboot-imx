@@ -15,6 +15,7 @@
 #include <sdhci.h>
 #include <u-boot/sha256.h>
 #include "mmc_private.h"
+#include <linux/delay.h>
 
 /* Request codes */
 #define RPMB_REQ_KEY		1
@@ -145,6 +146,11 @@ int mmc_rpmb_response(struct mmc *mmc, struct s_rpmb *s,
 #endif
 		return -1;
 	}
+
+#ifdef CONFIG_IMX95
+	udelay(100);
+#endif
+
 	/* Check the response and the status */
 	if (expected && be16_to_cpu(s->request) != expected) {
 #ifdef CONFIG_MMC_RPMB_TRACE

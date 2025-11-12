@@ -771,9 +771,6 @@ int mmc_load_image_raw_sector_dual_uboot(struct spl_image_info *spl_image,
 			spl_set_bl_len(&load, dev_desc->blksz);
 			load.read = h_spl_load_read;
 			ret = spl_load(spl_image, bootdev, &load, 0, info.start << dev_desc->log2blksz);
-			if (ret) {
-				return -1;
-			}
 #if !defined(CONFIG_XEN) && defined(CONFIG_IMX_TRUSTY_OS)
 			/* Image loaded successfully, go to verify rollback index */
 			if (rpmbkey_is_set()) {
@@ -834,9 +831,6 @@ int mmc_load_image_raw_sector_dual_uboot(struct spl_image_info *spl_image,
 			spl_set_bl_len(&load, dev_desc->blksz);
 			load.read = h_spl_load_read;
 			ret = spl_load(spl_image, bootdev, &load, 0, info.start << dev_desc->log2blksz);
-			if (ret) {
-				return -1;
-			}
 #if !defined(CONFIG_XEN) && defined(CONFIG_IMX_TRUSTY_OS)
 			/* Image loaded successfully, go to verify rollback index */
 			if (rpmbkey_is_set()) {

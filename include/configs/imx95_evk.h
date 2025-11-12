@@ -33,18 +33,31 @@
 
 #ifdef CONFIG_TARGET_IMX95_15X15_EVK
 #define JH_ROOT_DTB "imx95-15x15-evk-root.dtb"
-#else
-#define JH_ROOT_DTB "imx95-19x19-evk-root.dtb"
-#endif
-
+/* jh_root_mem: set the memory space used by Jailhouse root cell */
 #define JAILHOUSE_ENV \
 	"jh_root_dtb=" JH_ROOT_DTB "\0" \
 	"jh_mmcboot=setenv fdtfile ${jh_root_dtb}; " \
-		    "setenv jh_clk cpuidle.off=1 clk_ignore_unused mem=1408MB kvm-arm.mode=nvhe; " \
-		    "if run loadimage; then run mmcboot;" \
-		    "else run jh_netboot; fi; \0" \
+		"setenv jh_clk kvm.enable_virt_at_load=false cpuidle.off=1 clk_ignore_unused kvm-arm.mode=nvhe; " \
+		"setenv jh_root_mem 0x58000000@0x90000000,0xc0000000@0x180000000; " \
+		"if run loadimage; then run mmcboot;" \
+		"else run jh_netboot; fi; \0" \
 	"jh_netboot=setenv fdtfile ${jh_root_dtb}; " \
-		    "setenv jh_clk cpuidle.off=1 clk_ignore_unused mem=1408MB kvm-arm.mode=nvhe; run netboot; \0 "
+		"setenv jh_root_mem 0x58000000@0x90000000,0xc0000000@0x180000000; " \
+		"setenv jh_clk kvm.enable_virt_at_load=false cpuidle.off=1 clk_ignore_unused kvm-arm.mode=nvhe; run netboot; \0 "
+#else
+#define JH_ROOT_DTB "imx95-19x19-evk-root.dtb"
+/* jh_root_mem: set the memory space used by Jailhouse root cell */
+ #define JAILHOUSE_ENV \
+	"jh_root_dtb=" JH_ROOT_DTB "\0" \
+	"jh_mmcboot=setenv fdtfile ${jh_root_dtb}; " \
+		"setenv jh_clk kvm.enable_virt_at_load=false cpuidle.off=1 clk_ignore_unused kvm-arm.mode=nvhe; " \
+		"setenv jh_root_mem 0x58000000@0x90000000,0x300000000@0x180000000; " \
+		"if run loadimage; then run mmcboot;" \
+		"else run jh_netboot; fi; \0" \
+	"jh_netboot=setenv fdtfile ${jh_root_dtb}; " \
+		"setenv jh_root_mem 0x58000000@0x90000000,0x300000000@0x180000000; " \
+		"setenv jh_clk kvm.enable_virt_at_load=false cpuidle.off=1 clk_ignore_unused kvm-arm.mode=nvhe; run netboot; \0 "
+#endif
 
 #define CFG_MFG_ENV_SETTINGS \
 	CFG_MFG_ENV_SETTINGS_DEFAULT \
@@ -55,7 +68,7 @@
 
 #define XEN_BOOT_ENV \
 	    "domu-android-auto=no\0" \
-            "xenhyper_bootargs=console=dtuart dom0_mem=2048M dom0_max_vcpus=2 pci-passthrough=on\0" \
+            "xenhyper_bootargs=console=dtuart dom0_mem=4096M dom0_max_vcpus=2 pci-passthrough=on\0" \
             "xenlinux_bootargs= \0" \
             "xenlinux_console=hvc0 earlycon=xen\0" \
             "xenlinux_addr=0x9c000000\0" \
@@ -66,21 +79,25 @@
                 "${get_cmd} ${xenlinux_addr} ${image};" \
                 "fdt addr ${fdt_addr};" \
                 "fdt resize 256;" \
+                "fdt mknode /chosen module@0;" \
                 "fdt set /chosen/module@0 reg <0x00000000 ${xenlinux_addr} 0x00000000 0x${filesize}>;" \
                 "fdt set /chosen/module@0 bootargs \"${bootargs} ${xenlinux_bootargs}\"; " \
                 "fdt set /soc/bus@49000000/iommu@490d0000 status disabled;" \
+		"fdt set /chosen/module@0 compatible \"xen,linux-zimage\" \"xen,multiboot-module\";" \
                 "setenv bootargs ${xenhyper_bootargs};" \
                 "booti ${loadaddr} - ${fdt_addr};" \
             "\0" \
             "xennetboot=" \
                 "setenv get_cmd dhcp;" \
                 "setenv console ${xenlinux_console};" \
+		"setenv jh_clk clk_ignore_unused;" \
                 "run netargs;" \
                 "run xenboot_common;" \
             "\0" \
             "xenmmcboot=" \
                 "setenv get_cmd \"fatload mmc ${mmcdev}:${mmcpart}\";" \
                 "setenv console ${xenlinux_console};" \
+		"setenv jh_clk clk_ignore_unused;" \
                 "run mmcargs;" \
                 "run xenboot_common;" \
             "\0" \
@@ -92,7 +109,7 @@
 	BOOTENV \
 	AHAB_ENV \
 	"prepare_mcore=setenv mcore_args pd_ignore_unused;\0" \
-	"cpuidle=cpuidle.off=1\0" \
+	"cpuidle= \0" \
 	"scriptaddr=0x93500000\0" \
 	"kernel_addr_r=" __stringify(CONFIG_SYS_LOAD_ADDR) "\0" \
 	"image=Image\0" \
@@ -117,16 +134,12 @@
 	"loadimage=fatload mmc ${mmcdev}:${mmcpart} ${loadaddr} ${image}\0" \
 	"loadfdt=fatload mmc ${mmcdev}:${mmcpart} ${fdt_addr_r} ${fdtfile}\0" \
 	"loadcntr=fatload mmc ${mmcdev}:${mmcpart} ${cntr_addr} ${cntr_file}\0" \
-	"auth_os=auth_cntr ${cntr_addr}\0" \
+	"auth_os=booti ${cntr_addr}\0" \
 	"boot_os=booti ${loadaddr} - ${fdt_addr_r};\0" \
 	"mmcboot=echo Booting from mmc ...; " \
 		"run mmcargs; " \
 		"if test ${sec_boot} = yes; then " \
-			"if run auth_os; then " \
-				"run boot_os; " \
-			"else " \
-				"echo ERR: failed to authenticate; " \
-			"fi; " \
+			"run auth_os; " \
 		"else " \
 			"if test ${boot_fit} = yes || test ${boot_fit} = try; then " \
 				"bootm ${loadaddr}; " \
@@ -150,11 +163,7 @@
 		"fi; " \
 		"if test ${sec_boot} = yes; then " \
 			"${get_cmd} ${cntr_addr} ${cntr_file}; " \
-			"if run auth_os; then " \
-				"run boot_os; " \
-			"else " \
-				"echo ERR: failed to authenticate; " \
-			"fi; " \
+			"run auth_os; " \
 		"else " \
 			"${get_cmd} ${loadaddr} ${image}; " \
 			"if test ${boot_fit} = yes || test ${boot_fit} = try; then " \

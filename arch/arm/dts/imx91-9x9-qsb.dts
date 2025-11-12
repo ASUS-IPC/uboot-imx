@@ -276,8 +276,8 @@
 
 			ldo_snvs: LDO_SNVS {
 				regulator-name = "LDO_SNVS";
-				regulator-min-microvolt = <800000>;
-				regulator-max-microvolt = <3000000>;
+				regulator-min-microvolt = <1200000>;
+				regulator-max-microvolt = <3400000>;
 				regulator-boot-on;
 				regulator-always-on;
 			};
@@ -656,6 +656,15 @@
 			MX91_PAD_GPIO_IO19__MEDIAMIX_DISP_DATA15        0x31e
 			MX91_PAD_GPIO_IO20__MEDIAMIX_DISP_DATA16        0x31e
 			MX91_PAD_GPIO_IO21__MEDIAMIX_DISP_DATA17        0x31e
+		>;
+	};
+
+	pinctrl_lcdif_gpio: lcdifgpiogrp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO00__GPIO2_IO0			0x31e
+			MX91_PAD_GPIO_IO01__GPIO2_IO1			0x31e
+			MX91_PAD_GPIO_IO02__GPIO2_IO2			0x31e
+			MX91_PAD_GPIO_IO03__GPIO2_IO3			0x31e
 		>;
 	};
 };

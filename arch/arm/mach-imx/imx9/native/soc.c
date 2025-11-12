@@ -218,19 +218,26 @@ static u32 get_cpu_variant_type(u32 type)
 	bool npu_disable = !!(val & BIT(13));
 	bool core1_disable = !!(val & BIT(15));
 	u32 pack_9x9_fused = BIT(4) | BIT(5) | BIT(17) | BIT(19) | BIT(24);
-	u32 imx91_9x9_fused = BIT(4) | BIT(5);
-	u32 can_fused = BIT(28) | BIT(29) | BIT(30) | BIT(31);
-	bool enet2_disable = !!(val2 & BIT(6));
+	u32 nxp_recog = (val & GENMASK(23, 16)) >> 16;
 
 	/* For iMX91 */
 	if (type == MXC_CPU_IMX91) {
-		if ((val2 & imx91_9x9_fused) == imx91_9x9_fused) {
+		switch (nxp_recog) {
+		case 0x9:
+		case 0xA:
 			type = MXC_CPU_IMX9111;
-
-			if ((val & can_fused) == can_fused && enet2_disable)
-				type = MXC_CPU_IMX9101;
+			break;
+		case 0xD:
+		case 0xE:
+			type = MXC_CPU_IMX9121;
+			break;
+		case 0xF:
+		case 0x10:
+			type = MXC_CPU_IMX9101;
+			break;
+		default:
+			break;	/* 9131 as default */
 		}
-
 		return type;
 	}
 
@@ -680,35 +687,6 @@ static int delete_fdt_nodes(void *blob, const char *const nodes_path[], int size
 	return 0;
 }
 
-static int disable_eqos_nodes(void *blob)
-{
-	static const char * const nodes_path_eqos[] = {
-		"/soc@0/bus@42800000/ethernet@428a0000"
-	};
-
-	return delete_fdt_nodes(blob, nodes_path_eqos, ARRAY_SIZE(nodes_path_eqos));
-}
-
-static int disable_flexcan_nodes(void *blob)
-{
-	static const char * const nodes_path_flexcan[] = {
-		"/soc@0/bus@44000000/can@443a0000",
-		"/soc@0/bus@42000000/can@425b0000"
-	};
-
-	return delete_fdt_nodes(blob, nodes_path_flexcan, ARRAY_SIZE(nodes_path_flexcan));
-}
-
-static int disable_parallel_display_nodes(void *blob)
-{
-	static const char * const nodes_path_display[] = {
-		"/soc@0/system-controller@4ac10000/dpi",
-		"/soc@0/lcd-controller@4ae30000"
-	};
-
-	return delete_fdt_nodes(blob, nodes_path_display, ARRAY_SIZE(nodes_path_display));
-}
-
 static int disable_npu_nodes(void *blob)
 {
 	static const char * const nodes_path_npu[] = {
@@ -895,31 +873,6 @@ int board_fix_fdt(void *fdt)
 		}
 	}
 
-	if (is_imx9101()) {
-		int i = 0;
-		int nodeoff, ret;
-		const char *status = "disabled";
-		static const char * const nodes[] = {
-			"/soc@0/bus@42800000/ethernet@428a0000",
-			"/soc@0/system-controller@4ac10000/dpi",
-			"/soc@0/lcd-controller@4ae30000"
-		};
-
-		for (i = 0; i < ARRAY_SIZE(nodes); i++) {
-			nodeoff = fdt_path_offset(fdt, nodes[i]);
-			if (nodeoff > 0) {
-set_status:
-				ret = fdt_setprop(fdt, nodeoff, "status", status,
-						  strlen(status) + 1);
-				if (ret == -FDT_ERR_NOSPACE) {
-					ret = fdt_increase_size(fdt, 512);
-					if (!ret)
-						goto set_status;
-				}
-			}
-		}
-	}
-
 	return 0;
 }
 #endif
@@ -937,12 +890,6 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 	    is_imx9301())
 		disable_npu_nodes(blob);
 
-	if (is_imx9101()) {
-		disable_eqos_nodes(blob);
-		disable_flexcan_nodes(blob);
-		disable_parallel_display_nodes(blob);
-	}
-
 	if (is_voltage_mode(VOLT_LOW_DRIVE)) {
 		low_drive_freq_update(blob);
 		disable_lpm(blob);
@@ -954,8 +901,9 @@ int ft_system_setup(void *blob, struct bd_info *bd)
 #if defined(CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG)
 void get_board_serial(struct tag_serialnr *serialnr)
 {
-	printf("UID: 0x%x 0x%x 0x%x 0x%x\n",
-	       gd->arch.uid[0], gd->arch.uid[1], gd->arch.uid[2], gd->arch.uid[3]);
+	printf("UID: %08x%08x%08x%08x\n", __be32_to_cpu(gd->arch.uid[0]),
+	       __be32_to_cpu(gd->arch.uid[1]), __be32_to_cpu(gd->arch.uid[2]),
+	       __be32_to_cpu(gd->arch.uid[3]));
 
 	serialnr->low = __be32_to_cpu(gd->arch.uid[1]);
 	serialnr->high = __be32_to_cpu(gd->arch.uid[0]);
@@ -1147,7 +1095,7 @@ static int mix_power_init(enum mix_power_domain pd)
 	/* power on */
 	clrbits_le32(&mix_regs->slice_sw_ctrl, BIT(31));
 	val = readl(&mix_regs->func_stat);
-	while (val & SRC_MIX_SLICE_FUNC_STAT_ISO_STAT)
+	while (val & SRC_MIX_SLICE_FUNC_STAT_SSAR_STAT)
 		val = readl(&mix_regs->func_stat);
 
 	return 0;

@@ -61,6 +61,8 @@ static const char *get_imx_type_str(u32 imxtype)
 		return "93(01)";/* iMX93 900Mhz Low performance Single core without NPU */
 	case MXC_CPU_IMX91:
 		return "91(31)";/* iMX91 11x11 Full feature */
+	case MXC_CPU_IMX9121:
+		return "91(21)";/* iMX91 11x11 Low drive mode */
 	case MXC_CPU_IMX9111:
 		return "91(11)";/* iMX91 9x9 Reduced feature */
 	case MXC_CPU_IMX9101:
@@ -181,10 +183,7 @@ static int cpu_imx_get_desc(const struct udevice *dev, char *buf, int size)
 			grade = "Industrial temperature grade ";
 			break;
 		case TEMP_EXTCOMMERCIAL:
-			if (is_imx93())
-				grade = "Extended Industrial temperature grade ";
-			else
-				grade = "Extended Consumer temperature grade ";
+			grade = "Extended Industrial temperature grade ";
 			break;
 		default:
 			grade = "Consumer temperature grade ";
